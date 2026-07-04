@@ -1,0 +1,36 @@
+{
+  "shift_logs": [
+    {
+      "shift": "day",
+      "zone_id": "zone_a",
+      "supervisor": "Ravi Kumar",
+      "start": "2026-07-04 06:00:00",
+      "end": "2026-07-04 14:00:00",
+      "notes": "Normal operations, no incidents."
+    },
+    {
+      "shift": "night",
+      "zone_id": "zone_b",
+      "supervisor": "Farhan Ali",
+      "start": "2026-07-04 22:00:00",
+      "end": "2026-07-05 06:00:00",
+      "notes": "Gas sensor recalibrated at 23:10. Confined space permit renewed."
+    },
+    {
+      "shift": "day",
+      "zone_id": "zone_c",
+      "supervisor": "Vikram Rao",
+      "start": "2026-07-04 06:00:00",
+      "end": "2026-07-04 14:00:00",
+      "notes": "Hot work permit issued for welding repair."
+    },
+    {
+      "shift": "night",
+      "zone_id": "zone_d",
+      "supervisor": "Anita Joshi",
+      "start": "2026-07-04 22:00:00",
+      "end": "2026-07-05 06:00:00",
+      "notes": "Routine electrical inspection completed."
+    }
+  ]
+}
