@@ -1,0 +1,106 @@
+[
+  {
+    "zone_id": "ZONE_A",
+    "name": "Coke Oven Battery",
+    "description": "Primary coal heating and coke production facility",
+    "coordinates": {
+      "lat": 17.6868,
+      "lng": 83.2185
+    },
+    "area_sqm": 15000,
+    "max_workers": 120,
+    "hazard_type": "GAS",
+    "history_score": 9,
+    "adjacent_zones": [
+      "ZONE_E",
+      "ZONE_B"
+    ]
+  },
+  {
+    "zone_id": "ZONE_B",
+    "name": "Gas Processing Unit",
+    "description": "Refining and distribution of by-product gases",
+    "coordinates": {
+      "lat": 17.6865,
+      "lng": 83.2188
+    },
+    "area_sqm": 8000,
+    "max_workers": 40,
+    "hazard_type": "GAS",
+    "history_score": 7,
+    "adjacent_zones": [
+      "ZONE_A",
+      "ZONE_C",
+      "ZONE_D"
+    ]
+  },
+  {
+    "zone_id": "ZONE_C",
+    "name": "Blast Furnace Area",
+    "description": "Iron smelting and hot metal production zone",
+    "coordinates": {
+      "lat": 17.6860,
+      "lng": 83.2180
+    },
+    "area_sqm": 25000,
+    "max_workers": 200,
+    "hazard_type": "HEAT",
+    "history_score": 6,
+    "adjacent_zones": [
+      "ZONE_E",
+      "ZONE_B",
+      "ZONE_F"
+    ]
+  },
+  {
+    "zone_id": "ZONE_D",
+    "name": "Control Room",
+    "description": "Central monitoring and operations command center",
+    "coordinates": {
+      "lat": 17.6855,
+      "lng": 83.2192
+    },
+    "area_sqm": 2000,
+    "max_workers": 30,
+    "hazard_type": "ELECTRICAL",
+    "history_score": 1,
+    "adjacent_zones": [
+      "ZONE_B",
+      "ZONE_F"
+    ]
+  },
+  {
+    "zone_id": "ZONE_E",
+    "name": "Raw Material Storage",
+    "description": "Storage yard for coal, iron ore, and limestone",
+    "coordinates": {
+      "lat": 17.6872,
+      "lng": 83.2180
+    },
+    "area_sqm": 40000,
+    "max_workers": 60,
+    "hazard_type": "CHEMICAL",
+    "history_score": 4,
+    "adjacent_zones": [
+      "ZONE_A",
+      "ZONE_C"
+    ]
+  },
+  {
+    "zone_id": "ZONE_F",
+    "name": "Electrical Substation",
+    "description": "High voltage power distribution facility",
+    "coordinates": {
+      "lat": 17.6855,
+      "lng": 83.2182
+    },
+    "area_sqm": 5000,
+    "max_workers": 15,
+    "hazard_type": "ELECTRICAL",
+    "history_score": 5,
+    "adjacent_zones": [
+      "ZONE_C",
+      "ZONE_D"
+    ]
+  }
+]
