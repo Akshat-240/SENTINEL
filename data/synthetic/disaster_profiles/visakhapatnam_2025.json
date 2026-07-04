@@ -1,0 +1,13 @@
+{
+  "incident_name": "Visakhapatnam Steel Plant Gas Leak",
+  "date": "2025-01",
+  "gas_trend": "rising_sharp",
+  "temp_trend": "rising",
+  "permit_types_active": ["Hot Work", "Confined Space"],
+  "worker_count": 8,
+  "shift_type": "night",
+  "zone_history_score": 8,
+  "outcome": "8 fatalities",
+  "root_cause": "Gas accumulation undetected in confined space during hot work; permits active but not cross-checked against live sensor data.",
+  "intervention_window_hours": 6
+}
