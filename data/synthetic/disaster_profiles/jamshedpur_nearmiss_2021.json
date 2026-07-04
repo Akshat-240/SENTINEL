@@ -1,0 +1,13 @@
+{
+  "incident_name": "Jamshedpur Near-Miss",
+  "date": "2021",
+  "gas_trend": "rising_moderate",
+  "temp_trend": "rising",
+  "permit_types_active": ["Confined Space", "Electrical"],
+  "worker_count": 3,
+  "shift_type": "night",
+  "zone_history_score": 4,
+  "outcome": "No fatalities - evacuated in time",
+  "root_cause": "Manual worker vigilance caught rising gas before threshold breach; no automated system involved.",
+  "intervention_window_hours": 2
+}
