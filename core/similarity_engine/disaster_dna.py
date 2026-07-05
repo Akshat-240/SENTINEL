@@ -161,7 +161,7 @@ def get_similarity_scores(zone_snapshot, trend_data):
             intervention_window_hours = p.get("intervention_window_hours")
             
     # Trigger an alert if the similarity crosses the high threshold (70%)
-    alert = highest_similarity > 70.0
+    alert = highest_similarity >= getattr(settings, "SIMILARITY_HIGH_THRESHOLD", 70)
     
     return {
         "zone_id": zone_snapshot.get("zone_id"),

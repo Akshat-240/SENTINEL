@@ -25,7 +25,7 @@ REGULATORY_RULES = [
   {
     "rule_id": "OISD-GDN-192",
     "regulation": "OISD-GDN-192",
-    "description": "No simultaneous hot work and confined space entry in adjacent zones",
+    "description": "No simultaneous hot work and confined space entry in the same zone",
     "condition": "hot_work_permit AND confined_space_permit",
     "action": "BLOCK"
   },
@@ -73,10 +73,11 @@ def evaluate_condition(condition_str, permit_type, zone_snapshot):
     
     # Aggregate existing active permits
     active_types = [p.get("type", "").upper().replace(" ", "_") for p in zone_snapshot.get("active_permits", [])]
-    
+
     # Add the requested permit type to the check pool if it isn't there
-    if permit_type and permit_type not in active_types:
-        active_types.append(permit_type)
+    permit_type_norm = permit_type.upper().replace(" ", "_") if permit_type else None
+    if permit_type_norm and permit_type_norm not in active_types:
+        active_types.append(permit_type_norm)
         
     has_hot_work = "HOT_WORK" in active_types
     has_confined = "CONFINED_SPACE" in active_types

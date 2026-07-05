@@ -40,7 +40,7 @@ def generate_report():
         evidence = None
         evacuation_route = None
 
-        if score > 85:
+        if score >= settings.ORCHESTRATOR_TRIGGER:
             emerg = trigger_emergency_response(zone_id, risk_result)
             evidence = emerg.get("evidence")
             evacuation_route = emerg.get("evacuation_route")

@@ -35,7 +35,7 @@ def auto_rag(zone_id):
         risk_result = calculate_risk(snapshot)
         score = risk_result.get("final_score", 0)
         
-        if score > 75:
+        if score >= 75:
             gas = snapshot.get("gas_ppm", 0)
             temp = snapshot.get("temperature", 0)
             query = f"Safety procedures for zone {zone_id} with gas {gas} PPM and temperature {temp}C"

@@ -63,7 +63,7 @@ def get_worker_action(exposure_level, gas_ppm, risk_score, status="ACTIVE"):
     Determines the appropriate action for a worker based on exposure level, 
     ambient gas conditions, zone risk score, and worker status.
     """
-    if risk_score > 85:
+    if risk_score >= settings.CRITICAL_THRESHOLD:
         return "EVACUATE IMMEDIATELY"
     if exposure_level == "CRITICAL":
         return "EXIT IMMEDIATELY"

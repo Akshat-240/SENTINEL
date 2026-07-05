@@ -115,7 +115,7 @@ def get_trend_prediction(zone_id):
     Aggregates trend analysis for a zone, returning predictions, slopes,
     and alert flags if the critical threshold is approaching rapidly.
     """
-    readings = get_recent_readings(zone_id, n=5)
+    readings = get_recent_readings(zone_id, n=getattr(settings, "TREND_WINDOW_SIZE", 5))
     
     # Handle insufficient data edge case
     if len(readings) < 3:
@@ -132,7 +132,7 @@ def get_trend_prediction(zone_id):
     current_gas_ppm = readings[-1]
     slope = calculate_slope(readings)
     trend = classify_trend(slope)
-    predicted_in_15min = project_future(readings, minutes_ahead=15)
+    predicted_in_15min = project_future(readings, minutes_ahead=getattr(settings, "TREND_PROJECTION_MINUTES", 15))
     
     # Use settings defaults or fallback to 500
     critical_threshold = getattr(settings, "TREND_CRITICAL_GAS", 500)
