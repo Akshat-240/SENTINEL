@@ -1,0 +1,39 @@
+INCIDENT REPORT
+Title: Styrene Gas Leak at Chemical Storage Facility, Visakhapatnam
+Date: January 2025
+Location: Industrial zone, Visakhapatnam, Andhra Pradesh
+Type: Toxic gas leak (confined space + hot work overlap)
+
+SUMMARY:
+A styrene vapor leak occurred during night shift operations at a chemical
+storage tank. Investigation found that a Hot Work permit for repair welding
+was issued in the same zone where a Confined Space entry permit was already
+active, without cross-checking live gas sensor readings. Gas concentration
+rose from approximately 20 PPM to over 800 PPM within 10 minutes. Workers in
+the vicinity were not evacuated before the threshold breach because the
+permit system and the sensor monitoring system operated independently of
+each other, with no automatic linkage or compound-risk alert.
+
+KEY FACTORS:
+- Gas trend: sharp exponential rise within a 10-minute window
+- Active permits: Hot Work + Confined Space (same zone, same time)
+- Shift: Night shift, reduced supervisory staffing
+- Worker count in affected zone: 8
+- Zone risk history: High (prior minor leaks reported in preceding 2 years)
+
+OUTCOME:
+Multiple fatalities and injuries. Emergency shutdown was triggered manually,
+after the safe intervention window had already closed.
+
+ROOT CAUSE:
+Lack of real-time correlation between active work permits and live sensor
+trends. No automated compound-risk scoring existed to flag the dangerous
+overlap of Hot Work + Confined Space entry during rising gas conditions.
+
+LESSONS LEARNED:
+1. Permit issuance systems must be cross-checked against live sensor data
+   before approval, not just at the time of manual review.
+2. Compound risk (multiple simultaneous hazardous permits in one zone)
+   should trigger an automatic elevated risk score.
+3. Night shifts require the same or stricter automated safety oversight
+   as day shifts, since supervisory presence is typically lower.

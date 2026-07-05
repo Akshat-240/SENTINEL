@@ -1,0 +1,34 @@
+INCIDENT REPORT
+Title: Hot Work Fire Incident, Haldia Refinery Area
+Date: 2019
+Location: Haldia, West Bengal
+Type: Fire following hot work near flammable vapor accumulation
+
+SUMMARY:
+A fire broke out during a hot work (welding) operation carried out under an
+approved Hot Work permit. Gas monitoring later showed flammable vapor
+concentration had been rising steadily in the hours before the permit was
+approved, but the permit approval process did not incorporate a live check
+of ambient gas levels at the work location. The fire spread quickly due to
+the presence of flammable material within the safety radius of the hot work.
+
+KEY FACTORS:
+- Gas trend: rising sharply in the hours before ignition
+- Temperature trend: stable, not a leading indicator in this case
+- Active permit: Hot Work only
+- Shift: Day shift
+- Worker count in affected zone: 5
+
+OUTCOME:
+Fire caused multiple fatalities and significant equipment damage. Cause was
+traced to inadequate gas-level verification prior to permit approval.
+
+ROOT CAUSE:
+Hot work permits were approved based on a checklist review rather than a
+live, automated safety-threshold check against current sensor readings.
+
+LESSONS LEARNED:
+1. Hot Work permits should not be approved when gas readings exceed a
+   defined safety threshold, verified automatically at approval time.
+2. Permit systems should re-validate conditions periodically during long
+   duration hot work jobs, not just once at issuance.

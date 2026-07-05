@@ -1,0 +1,42 @@
+INCIDENT REPORT
+Title: Confined Space Gas Near-Miss, Jamshedpur
+Date: 2021
+Location: Jamshedpur, Jharkhand
+Type: Near-miss - gas accumulation in confined space, no fatalities
+
+SUMMARY:
+During a routine confined space entry (combined with an active electrical
+work permit in the same zone), workers noticed a gradual, moderate rise in
+gas readings on a handheld detector. The shift supervisor, acting on
+experience and vigilance rather than any automated alert, ordered an
+immediate evacuation. Follow-up investigation confirmed gas levels had been
+approaching the danger threshold and would likely have caused a serious
+incident within roughly two more hours if unaddressed.
+
+KEY FACTORS:
+- Gas trend: rising moderately over an extended period (slower than the
+  Visakhapatnam and Haldia cases)
+- Active permits: Confined Space + Electrical (same zone)
+- Shift: Night shift
+- Worker count in affected zone: 3
+- Zone risk history: Moderate
+
+OUTCOME:
+No injuries or fatalities. Evacuation completed with an estimated 2-hour
+safety margin before the situation would have become critical.
+
+ROOT CAUSE:
+Absence of automated gas monitoring integrated with the confined space
+permit system; safety outcome depended entirely on individual worker
+vigilance rather than a systemic safeguard.
+
+LESSONS LEARNED:
+1. Manual vigilance is not a reliable substitute for automated, continuous
+   monitoring - this incident succeeded only because of an experienced
+   supervisor's judgment call.
+2. Systems that flag "slow moderate rise" trends (not just sharp spikes)
+   are valuable, since slower near-misses like this one can still become
+   fatal without early detection.
+3. This case is a useful contrast to Visakhapatnam/Haldia: same category of
+   hazard (gas + permit overlap), very different outcome, due to earlier
+   human intervention.
