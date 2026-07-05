@@ -1,0 +1,32 @@
+REFERENCE NOTE: Common Patterns Across Indian Industrial Incidents
+(Compiled for RAG knowledge base - general safety learning reference)
+
+Across publicly documented Indian industrial incidents involving gas
+leaks, fires, and confined space hazards, several recurring patterns
+emerge that are useful for automated risk detection systems:
+
+1. COMPOUND PERMIT RISK: A large share of serious incidents involve two or
+   more simultaneously active permits in the same zone (most commonly Hot
+   Work overlapping with Confined Space entry). Systems that only check one
+   permit at a time miss this compounding danger.
+
+2. NIGHT SHIFT VULNERABILITY: Incidents during night shifts tend to have
+   fewer supervisory staff present and slower response times, even when
+   the underlying hazard (gas leak, fire risk) is similar in nature to a
+   day-shift scenario.
+
+3. RATE OF CHANGE MATTERS MORE THAN ABSOLUTE VALUE: Sharp, fast-rising gas
+   trends (e.g., 20 PPM to 800+ PPM within 10 minutes) are associated with
+   worse outcomes than slow, moderate rises, largely because slow rises
+   leave more time for manual or automated intervention.
+
+4. HISTORICAL ZONE RISK IS PREDICTIVE: Zones with a prior history of minor
+   leaks or near-misses are statistically more likely to experience a
+   repeat or escalated incident, supporting the use of a "zone history
+   score" as an input to a compound risk model.
+
+5. THE INTERVENTION WINDOW: Near-miss cases (like Jamshedpur, 2021) show
+   that a window of roughly 1-6 hours often exists between early warning
+   signs and a critical threshold breach. Automated systems that can
+   detect and alert within this window have a realistic chance of
+   preventing escalation to a fatal outcome.
