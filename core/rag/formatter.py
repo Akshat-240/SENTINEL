@@ -4,10 +4,18 @@ Purpose: Combine retrieval results with Gemini formatting
 Creates the final output that goes to the dashboard
 """
 
+import os
+import sys
 import logging
 from typing import Dict, List, Optional
-from retriever import RAGRetriever
-from gemini_client import GeminiClient
+
+# Resolve project root
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
+from core.rag.retriever import RAGRetriever
+from gemini.client import GeminiClient
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

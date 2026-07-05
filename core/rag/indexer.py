@@ -1,11 +1,11 @@
 """
 SENTINEL — RAG Indexer
-Purpose: Load incident PDFs and index them into FAISS for fast similarity search
-
+Purpose: Load incident PDFs and text reports, then index them into FAISS for fast similarity search
 """
 
 import os
-import PyPDF2
+import sys
+import pypdf
 import numpy as np
 from pathlib import Path
 from sentence_transformers import SentenceTransformer
@@ -13,12 +13,19 @@ import faiss
 import json
 import logging
 
+# Resolve project root
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
+from config import settings
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 class RAGIndexer:
-    def __init__(self, model_name="all-MiniLM-L6-v2", index_path="faiss_indices"):
+    def __init__(self, model_name="all-MiniLM-L6-v2", index_path=None):
         """
         Initialize FAISS indexer with sentence-transformers embeddings
         
@@ -29,6 +36,9 @@ class RAGIndexer:
         self.model = SentenceTransformer(model_name)
         self.embedding_dim = self.model.get_sentence_embedding_dimension()
         self.index = faiss.IndexFlatL2(self.embedding_dim)
+        
+        if index_path is None:
+            index_path = os.path.join(PROJECT_ROOT, settings.FAISS_INDEX_PATH)
         self.index_path = index_path
         self.documents = []  # Store document metadata
         self.chunks = []  # Store text chunks
@@ -38,7 +48,7 @@ class RAGIndexer:
     
     def extract_pdf_text(self, pdf_path):
         """
-        Extract text from PDF file
+        Extract text from PDF file using pypdf
         
         Args:
             pdf_path: Path to PDF file
@@ -49,10 +59,12 @@ class RAGIndexer:
         try:
             text = ""
             with open(pdf_path, 'rb') as file:
-                reader = PyPDF2.PdfReader(file)
+                reader = pypdf.PdfReader(file)
                 for page_num in range(len(reader.pages)):
                     page = reader.pages[page_num]
-                    text += page.extract_text()
+                    page_text = page.extract_text()
+                    if page_text:
+                        text += page_text + "\n"
             
             logger.info(f"✅ Extracted {len(text)} chars from {Path(pdf_path).name}")
             return text
@@ -73,6 +85,10 @@ class RAGIndexer:
             list: List of text chunks
         """
         chunks = []
+        text = text.strip()
+        if len(text) <= chunk_size:
+            return [text] if len(text) > 20 else []
+            
         for i in range(0, len(text), chunk_size - overlap):
             chunk = text[i:i + chunk_size]
             if len(chunk.strip()) > 50:  # Skip tiny chunks
@@ -100,6 +116,9 @@ class RAGIndexer:
         chunks = self.chunk_text(text)
         logger.info(f"📦 Created {len(chunks)} chunks from {doc_name}")
         
+        if not chunks:
+            return
+            
         # Embed chunks
         embeddings = self.model.encode(chunks, convert_to_numpy=True)
         
@@ -116,25 +135,66 @@ class RAGIndexer:
         
         logger.info(f"✅ Indexed {doc_name} | Total chunks: {len(self.chunks)}")
     
-    def index_directory(self, pdf_dir):
+    def index_txt(self, txt_path, doc_name=None):
         """
-        Index all PDFs in a directory
+        Index a single text file into FAISS
         
         Args:
-            pdf_dir: Directory containing PDF files
+            txt_path: Path to TXT file
+            doc_name: Friendly name for document (if None, use filename)
         """
-        pdf_files = list(Path(pdf_dir).glob("*.pdf"))
-        logger.info(f"📂 Found {len(pdf_files)} PDFs in {pdf_dir}")
+        if doc_name is None:
+            doc_name = Path(txt_path).stem
+            
+        try:
+            with open(txt_path, 'r', encoding='utf-8') as file:
+                text = file.read()
+                
+            if not text.strip():
+                return
+                
+            chunks = self.chunk_text(text)
+            logger.info(f"📦 Created {len(chunks)} chunks from {doc_name}")
+            
+            if not chunks:
+                return
+                
+            embeddings = self.model.encode(chunks, convert_to_numpy=True)
+            self.index.add(embeddings.astype('float32'))
+            
+            for chunk in chunks:
+                self.chunks.append({
+                    "text": chunk,
+                    "source": doc_name,
+                    "source_path": str(txt_path)
+                })
+                
+            logger.info(f"✅ Indexed {doc_name} | Total chunks: {len(self.chunks)}")
+        except Exception as e:
+            logger.error(f"❌ Error indexing text file {txt_path}: {e}")
+    
+    def index_directory(self, doc_dir):
+        """
+        Index all PDFs and TXT files in a directory
+        
+        Args:
+            doc_dir: Directory containing document files
+        """
+        doc_path = Path(doc_dir)
+        pdf_files = list(doc_path.glob("*.pdf"))
+        txt_files = list(doc_path.glob("*.txt"))
+        logger.info(f"📂 Found {len(pdf_files)} PDFs and {len(txt_files)} TXT files in {doc_dir}")
         
         for pdf_path in pdf_files:
             self.index_pdf(str(pdf_path))
+        for txt_path in txt_files:
+            self.index_txt(str(txt_path))
         
-        logger.info(f"✅ Indexed {len(pdf_files)} PDFs | Total chunks: {len(self.chunks)}")
+        logger.info(f"✅ Indexed directory {doc_dir} | Total chunks: {len(self.chunks)}")
     
     def index_synthetic_incidents(self):
         """
         Create synthetic incident profiles for demo (Days 1-4)
-        Replace with real PDFs in Days 5-7
         """
         synthetic_docs = {
             "visakhapatnam_2025": """
@@ -219,6 +279,8 @@ class RAGIndexer:
         
         for doc_name, content in synthetic_docs.items():
             chunks = self.chunk_text(content, chunk_size=300)
+            if not chunks:
+                continue
             embeddings = self.model.encode(chunks, convert_to_numpy=True)
             self.index.add(embeddings.astype('float32'))
             
@@ -260,19 +322,21 @@ class RAGIndexer:
         return False
 
 
-# Day 1-3: Demo with synthetic data
+# Execute indexing when run directly
 if __name__ == "__main__":
     indexer = RAGIndexer()
     
-    # Option 1: Index synthetic incidents (Days 1-3)
+    # 1. Index synthetic incidents (baseline)
     indexer.index_synthetic_incidents()
     
-    # Option 2: Index real PDFs (Days 5-7)
-    # pdf_directory = "data/incident_pdfs"
-    # if os.path.exists(pdf_directory):
-    #     indexer.index_directory(pdf_directory)
-    
-    # Save for retriever to use
+    # 2. Index real documents in corpus directory
+    corpus_dir = os.path.join(PROJECT_ROOT, "data/incident_corpus")
+    if os.path.exists(corpus_dir):
+        indexer.index_directory(corpus_dir)
+    else:
+        logger.warning(f"⚠️ Corpus directory not found at {corpus_dir}")
+        
+    # Save the index
     indexer.save_index()
     
     print(f"\n📊 Indexing Complete:")

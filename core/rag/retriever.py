@@ -5,18 +5,26 @@ Returns top 3 most relevant incidents for current zone state
 """
 
 import os
+import sys
 import json
 import numpy as np
 from sentence_transformers import SentenceTransformer
 import faiss
 import logging
 
+# Resolve project root
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
+from config import settings
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 class RAGRetriever:
-    def __init__(self, index_path="faiss_indices", model_name="all-MiniLM-L6-v2"):
+    def __init__(self, index_path=None, model_name="all-MiniLM-L6-v2"):
         """
         Initialize RAG retriever
         
@@ -25,6 +33,8 @@ class RAGRetriever:
             model_name: Sentence transformer model (must match indexer)
         """
         self.model = SentenceTransformer(model_name)
+        if index_path is None:
+            index_path = os.path.join(PROJECT_ROOT, settings.FAISS_INDEX_PATH)
         self.index_path = index_path
         self.index = None
         self.chunks = []
@@ -48,7 +58,7 @@ class RAGRetriever:
         
         try:
             self.index = faiss.read_index(index_file)
-            with open(metadata_file, 'r') as f:
+            with open(metadata_file, 'r', encoding='utf-8') as f:
                 self.chunks = json.load(f)
             
             logger.info(f"✅ Loaded index with {self.index.ntotal} chunks")
@@ -109,32 +119,26 @@ class RAGRetriever:
         logger.info(f"🔍 Search query: {query}")
         return query
     
-    def retrieve(self, zone_snapshot, top_k=3):
+    def retrieve(self, query_or_snapshot, top_k=3):
         """
         Search FAISS index for similar incidents
         
         Args:
-            zone_snapshot: Current zone conditions
+            query_or_snapshot: Current zone conditions (dict) or search query (str)
             top_k: Number of results to return
         
         Returns:
             list: Top-k similar incidents with scores
-            [
-                {
-                    "rank": 1,
-                    "score": 0.234,
-                    "text": "...",
-                    "source": "visakhapatnam_2025"
-                },
-                ...
-            ]
         """
         if self.index is None or len(self.chunks) == 0:
             logger.warning("⚠️  Index not loaded. Returning empty results.")
             return []
         
-        # Build semantic query from zone state
-        query_text = self.build_query(zone_snapshot)
+        # Build semantic query from input type
+        if isinstance(query_or_snapshot, dict):
+            query_text = self.build_query(query_or_snapshot)
+        else:
+            query_text = str(query_or_snapshot)
         
         # Encode query
         query_embedding = self.model.encode([query_text], convert_to_numpy=True)
@@ -236,10 +240,30 @@ class RAGRetriever:
         return "\n".join(output)
 
 
+# Singleton instance cached at module level for import/call in other modules
+_retriever_instance = None
+
+def retrieve(query_or_snapshot, top_k=3):
+    """
+    Module level standalone retrieve function.
+    Dynamically loads RAGRetriever on first call and queries the FAISS index.
+    
+    Args:
+        query_or_snapshot: String query or zone snapshot dict
+        top_k: Number of results to retrieve
+        
+    Returns:
+        list: Retrieval results matching the signature expected by caller
+    """
+    global _retriever_instance
+    if _retriever_instance is None:
+        index_path = os.path.join(PROJECT_ROOT, settings.FAISS_INDEX_PATH)
+        _retriever_instance = RAGRetriever(index_path=index_path)
+    return _retriever_instance.retrieve(query_or_snapshot, top_k=top_k)
+
+
 # Demo/Testing
 if __name__ == "__main__":
-    retriever = RAGRetriever()
-    
     # Test with different zone scenarios
     test_scenarios = [
         {
@@ -279,7 +303,11 @@ if __name__ == "__main__":
         print(f"\n🔬 Scenario: {scenario['scenario']}")
         print(f"   Zone {scenario['zone_id']} | Gas: {scenario['gas_ppm']} PPM | Temp: {scenario['temperature']}°C")
         
-        results = retriever.retrieve(scenario, top_k=3)
-        formatted = retriever.format_results(results)
+        # Test the module level retrieve function
+        results = retrieve(scenario, top_k=3)
+        
+        # Instantiate retriever to format results
+        r = RAGRetriever(index_path=os.path.join(PROJECT_ROOT, settings.FAISS_INDEX_PATH))
+        formatted = r.format_results(results)
         print(formatted)
         print("-" * 60)
