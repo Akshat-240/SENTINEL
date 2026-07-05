@@ -1,6 +1,6 @@
 {
   "incident_name": "Jamshedpur Near-Miss",
-  "date": "2021",
+  "date": "2021-01-01",
   "gas_trend": "rising_moderate",
   "temp_trend": "rising",
   "permit_types_active": ["Confined Space", "Electrical"],

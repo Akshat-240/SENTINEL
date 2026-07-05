@@ -12,7 +12,7 @@
       "name": "Ajay Singh",
       "zone_id": "zone_c",
       "entry_time": "2026-07-04 09:07:00",
-      "shift_type": "night"
+      "shift_type": "day"
     },
     {
       "worker_id": "W03",
@@ -26,7 +26,7 @@
       "name": "Suresh Patil",
       "zone_id": "zone_b",
       "entry_time": "2026-07-04 08:57:00",
-      "shift_type": "night"
+      "shift_type": "day"
     },
     {
       "worker_id": "W05",
@@ -61,14 +61,14 @@
       "name": "Deepak Verma",
       "zone_id": "zone_b",
       "entry_time": "2026-07-04 09:09:00",
-      "shift_type": "night"
+      "shift_type": "day"
     },
     {
       "worker_id": "W10",
       "name": "Sunita Yadav",
       "zone_id": "zone_d",
       "entry_time": "2026-07-04 09:24:00",
-      "shift_type": "night"
+      "shift_type": "day"
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "incident_name": "Visakhapatnam Steel Plant Gas Leak",
-  "date": "2025-01",
+  "date": "2025-01-01",
   "gas_trend": "rising_sharp",
   "temp_trend": "rising",
   "permit_types_active": ["Hot Work", "Confined Space"],
