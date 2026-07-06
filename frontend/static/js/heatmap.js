@@ -333,7 +333,13 @@
     if (isPlaying) { stopPlay(); return; }
     mode = 'historical';
     isPlaying = true;
-    if (viewTickIndex >= tickCount - 1) viewTickIndex = 0; // restart from beginning if already at the end
+
+    if (viewTickIndex >= tickCount - 1) {
+      viewTickIndex = 0; // restart from beginning if already at the end
+      notifications.length = 0;
+      lastNotifiedLevelByZone = {};
+    }
+
     renderAll();
     playTimer = setInterval(() => {
       viewTickIndex += 1;
