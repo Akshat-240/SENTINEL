@@ -41,10 +41,10 @@ class RAGFormatter:
         Returns:
             dict: Dashboard-ready output with:
                 {
-                    "analysis": "...",
-                    "incidents": [...],
-                    "recommendation": "...",
-                    "regulatory_alerts": [...]
+                    "analysis_text": "...",
+                    "similar_incidents": [...],
+                    "action_items": [...],
+                    "regulatory_flags": [...]
                 }
         """
         logger.info(f"📊 Formatting for dashboard | Zone: {zone_snapshot.get('zone_id')} | Score: {risk_score}")
@@ -195,7 +195,10 @@ class RAGFormatter:
         
         gas = zone_snapshot.get("gas_ppm", 0)
         temp = zone_snapshot.get("temperature", 0)
-        permits = zone_snapshot.get("permits", [])
+
+        permits = zone_snapshot.get("permits")
+        if permits is None:
+            permits = [p.get("type", "").lower().replace(" ", "_") for p in zone_snapshot.get("active_permits", [])]
         shift = zone_snapshot.get("shift_type", "")
         
         # OISD violations
@@ -224,7 +227,7 @@ class RAGFormatter:
             })
         
         # Night shift enhanced monitoring
-        if shift == "night" and gas > 200:
+        if str(shift).upper() == "NIGHT" and gas > 200:
             violations.append({
                 "code": "DGMS Circular 2019",
                 "severity": "MEDIUM",

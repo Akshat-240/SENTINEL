@@ -89,9 +89,16 @@ class RAGRetriever:
         """
         gas = zone_snapshot.get("gas_ppm", 0)
         temp = zone_snapshot.get("temperature", 0)
-        permits = zone_snapshot.get("permits", [])
+
+        permits = zone_snapshot.get("permits")
+        if permits is None:
+            active_permits = zone_snapshot.get("active_permits", [])
+            permits = [p.get("type", "").upper().replace(" ", "_") for p in active_permits]
+        else:
+            permits = [str(p).upper().replace(" ", "_") for p in permits]
+
         workers = zone_snapshot.get("worker_count", 0)
-        shift = zone_snapshot.get("shift_type", "day")
+        shift = str(zone_snapshot.get("shift_type", "DAY")).upper()
         
         # Build semantic query
         query_parts = []
@@ -100,15 +107,15 @@ class RAGRetriever:
             query_parts.append(f"gas accumulation {gas} PPM")
         if temp > 60:
             query_parts.append(f"elevated temperature {temp} degrees")
-        if "hot_work" in permits and "confined_space" in permits:
+        if "HOT_WORK" in permits and "CONFINED_SPACE" in permits:
             query_parts.append("hot work in confined space")
-        elif "hot_work" in permits:
+        elif "HOT_WORK" in permits:
             query_parts.append("hot work permit")
-        if "electrical" in permits:
+        if "ELECTRICAL" in permits:
             query_parts.append("electrical maintenance")
         if workers > 3:
             query_parts.append(f"{workers} workers present")
-        if shift == "night":
+        if shift == "NIGHT":
             query_parts.append("night shift")
         
         # If no conditions, return generic query

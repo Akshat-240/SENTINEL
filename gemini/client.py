@@ -41,9 +41,8 @@ def call_gemini(prompt, max_tokens=1000):
 
 class GeminiClient:
     def __init__(self):
-        """Initialize the Gemini client using settings model"""
-        self.model = get_gemini_model()
-        
+        """Initialize the Gemini client."""
+        pass
     def format_rag_response(self, rag_results, zone_snapshot):
         """
         Format retrieved historical incidents and active conditions into a dashboard alert analysis.
@@ -58,7 +57,7 @@ We have detected a high risk situation in Zone {zone_snapshot.get('zone_id')}.
 Current conditions:
 - Gas Concentration: {zone_snapshot.get('gas_ppm', 0)} PPM
 - Temperature: {zone_snapshot.get('temperature', 0)}°C
-- Active Permits: {', '.join(zone_snapshot.get('permits', []))}
+- Active Permits: {', '.join([p.get('type', '') for p in zone_snapshot.get('active_permits', [])])}
 - Worker Count: {zone_snapshot.get('worker_count', 0)}
 - Shift: {zone_snapshot.get('shift_type', 'day')} shift
 
@@ -94,7 +93,7 @@ A high-risk alert was triggered:
 - Zone ID: {zone_snapshot.get('zone_id')}
 - Timestamp: {zone_snapshot.get('timestamp', 'N/A')}
 - Final Risk Score: {compound_score}
-- Active Permits: {', '.join(zone_snapshot.get('permits', []))}
+- Active Permits: {', '.join([p.get('type', '') for p in zone_snapshot.get('active_permits', [])])}
 - Sensor Conditions: Gas {zone_snapshot.get('gas_ppm', 0)} PPM, Temp {zone_snapshot.get('temperature', 0)}°C, Pressure {zone_snapshot.get('pressure', 0)} Bar
 - Worker Count: {zone_snapshot.get('worker_count', 0)}
 
@@ -126,8 +125,8 @@ Format the output as a professional regulatory document in Markdown.
         
         search_query = user_message
         if context:
-            search_query += f" zone {context.get('zone_id')} gas {context.get('gas_ppm', 0)} temp {context.get('temperature', 0)} permits {', '.join(context.get('permits', []))}"
-            
+            permit_types = [p.get("type", "") for p in context.get("active_permits", [])]
+            search_query += f" zone {context.get('zone_id')} gas {context.get('gas_ppm', 0)} temp {context.get('temperature', 0)} permits {', '.join(permit_types)}"
         rag_results = retrieve(search_query, top_k=3)
         
         context_str = ""
