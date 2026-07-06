@@ -1,7 +1,7 @@
 /* ==========================================================================
    SENTINEL — common.js
    Shared across every page: nav active-state, theme toggle,
-   floating copilot widget, and the shared click-to-expand pattern
+   floating ai_assistant widget, and the shared click-to-expand pattern
    (used by Alert Panel cards here, and Replay timeline entries elsewhere).
    ========================================================================== */
 
@@ -85,11 +85,11 @@
   };
   window.SentinelExpand = SentinelExpand;
 
-  /* ---------- Floating Copilot widget ---------- */
-  function initCopilotFab() {
-    const fab = document.querySelector('.copilot-fab');
+  /* ---------- Floating ai_assistant widget ---------- */
+  function initai_assistantFab() {
+    const fab = document.querySelector('.ai_assistant-fab');
     if (!fab) return;
-    const button = fab.querySelector('.copilot-fab__button');
+    const button = fab.querySelector('.ai_assistant-fab__button');
 
     button.addEventListener('click', () => {
       fab.classList.toggle('is-open');
@@ -106,6 +106,6 @@
     initTheme();
     tickClock();
     setInterval(tickClock, 1000);
-    initCopilotFab();
+    initai_assistantFab();
   });
 })();
