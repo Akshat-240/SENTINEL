@@ -74,13 +74,14 @@
 
     const tooltip = document.getElementById('trendTooltip');
     container.querySelectorAll('.trend-dot').forEach((dot) => {
-      dot.addEventListener('mouseenter', (e) => {
-        const rect = container.getBoundingClientRect();
-        const cx = parseFloat(dot.getAttribute('cx'));
-        const cy = parseFloat(dot.getAttribute('cy'));
+      dot.addEventListener('mouseenter', () => {
+        const containerRect = container.getBoundingClientRect();
+        const dotRect = dot.getBoundingClientRect();
+        const x = dotRect.left - containerRect.left + dotRect.width / 2;
+        const y = dotRect.top - containerRect.top + dotRect.height / 2;
         tooltip.textContent = `${dot.dataset.value} PPM`;
-        tooltip.style.left = `${cx}px`;
-        tooltip.style.top = `${cy}px`;
+        tooltip.style.left = `${x}px`;
+        tooltip.style.top = `${y}px`;
         tooltip.style.opacity = '1';
       });
       dot.addEventListener('mouseleave', () => {

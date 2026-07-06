@@ -27,15 +27,21 @@
   }
 
   function initTheme() {
-    // In-memory only for this session (no browser storage dependency).
-    let theme = window.__sentinelTheme || 'day';
+    let theme = 'day';
+    try {
+      theme = window.localStorage.getItem(THEME_KEY) || 'day';
+    } catch (_) {
+      theme = 'day';
+    }
+    if (theme !== 'night') theme = 'day';
+
     applyTheme(theme);
 
     const btn = document.querySelector('.theme-toggle');
     if (btn) {
       btn.addEventListener('click', () => {
         theme = theme === 'day' ? 'night' : 'day';
-        window.__sentinelTheme = theme;
+        try { window.localStorage.setItem(THEME_KEY, theme); } catch (_) {}
         applyTheme(theme);
       });
     }
@@ -86,7 +92,7 @@
   window.SentinelExpand = SentinelExpand;
 
   /* ---------- Floating ai_assistant widget ---------- */
-  function initai_assistantFab() {
+  function initAiAssistantFab() {
     const fab = document.querySelector('.ai_assistant-fab');
     if (!fab) return;
     const button = fab.querySelector('.ai_assistant-fab__button');
@@ -106,6 +112,6 @@
     initTheme();
     tickClock();
     setInterval(tickClock, 1000);
-    initai_assistantFab();
+    initAiAssistantFab();
   });
 })();

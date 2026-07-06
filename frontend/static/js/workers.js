@@ -33,9 +33,11 @@
       return;
     }
 
-    const sorted = [...WORKERS].sort(
-      (a, b) => URGENCY_ORDER.indexOf(a.status) - URGENCY_ORDER.indexOf(b.status)
-    );
+    const sorted = [...WORKERS].sort((a, b) => {
+      const aRank = URGENCY_ORDER.indexOf(a.status);
+      const bRank = URGENCY_ORDER.indexOf(b.status);
+      return (aRank === -1 ? URGENCY_ORDER.length : aRank) - (bRank === -1 ? URGENCY_ORDER.length : bRank);
+    });
 
     panel.innerHTML = sorted.map((w) => `
       <div class="worker-row">
