@@ -1,0 +1,149 @@
+/* ==========================================================================
+   SENTINEL — heatmap.css
+   Page-specific additions for heatmap.html. Reuses all tokens from
+   sentinel.css v2 (colors, radii, shadows, type) — no new visual language.
+   ========================================================================== */
+
+.heatmap-shell {
+  display: flex; flex-direction: column; gap: 16px;
+  max-width: 1400px; margin: 0 auto; padding: 28px 22px 100px;
+}
+
+/* ---------- Mode bar ---------- */
+.mode-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 18px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  transition: background var(--dur-med) var(--ease);
+}
+.mode-bar.is-historical { background: var(--bg-sunken); }
+
+.mode-bar__status { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+.mode-bar__status .pill__dot { animation: modePulse 1.8s var(--ease) infinite; }
+.mode-bar.is-historical .mode-bar__status .pill__dot { animation: none; }
+@keyframes modePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+.mode-bar__label--live { color: var(--risk-normal); }
+.mode-bar__label--historical { color: var(--text-secondary); }
+
+.mode-bar__return {
+  font-size: 12px; font-weight: 600; color: var(--text);
+  background: var(--bg-sunken); padding: 7px 14px; border-radius: var(--radius-pill);
+  transition: background var(--dur-fast) var(--ease);
+  display: none;
+}
+.mode-bar.is-historical .mode-bar__return { display: inline-flex; }
+.mode-bar__return:hover { background: var(--border-strong); }
+
+/* ---------- Map card ---------- */
+/* z-index:1 pins the map's own stacking context low, so Leaflet's internal
+   panes/controls (which use high z-index values *within* that context)
+   can never render above fixed overlays like the notification panel. */
+.map-card { padding: 0; overflow: hidden; position: relative; z-index: 1; }
+.map-card__surface { width: 100%; height: 520px; }
+@media (max-width: 720px) { .map-card__surface { height: 380px; } }
+
+/* Leaflet popups/attribution restyled to match the soft/rounded system */
+.leaflet-popup-content-wrapper { border-radius: var(--radius-sm); box-shadow: var(--shadow-elevated); }
+.leaflet-container { font-family: var(--font-body); background: var(--bg-sunken); }
+
+/* ---------- Night-mode base map dimming ---------- */
+/* Per design decision: don't swap in a separate dark tile set — just dim the
+   existing Voyager tiles with a CSS filter, scoped to the tile pane only.
+   Zone overlays, worker/sensor markers, and zone labels live in Leaflet's
+   marker/overlay panes (separate DOM layers), so they are completely
+   untouched and stay at full color/opacity in both themes.
+   Because this is a plain attribute-selector rule (not JS-driven), it takes
+   effect the instant the existing theme toggle flips data-theme on <html> —
+   no extra wiring, no refresh, matching the rest of the UI's theme behavior. */
+html[data-theme="night"] .leaflet-tile-pane {
+  filter: brightness(0.72) contrast(1.06) saturate(0.82);
+  transition: filter var(--dur-med) var(--ease);
+}
+
+/* Zone label shown directly on the map (Zone ID · facility area · risk level) */
+.zone-label {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  padding: 3px 8px; border-radius: var(--radius-pill);
+  background: var(--pill-bg, var(--risk-normal-tint));
+  color: var(--pill-fg, var(--risk-normal));
+  white-space: nowrap; box-shadow: var(--shadow-card);
+}
+
+/* Worker / sensor markers */
+.map-dot { border-radius: 50%; border: 2px solid var(--bg-elevated); box-shadow: var(--shadow-card); }
+.map-square { border-radius: 3px; border: 2px solid var(--bg-elevated); box-shadow: var(--shadow-card); opacity: 0.85; }
+
+/* ---------- Scrubber (Historical mode only) ---------- */
+.scrubber-card { display: none; }
+.mode-bar.is-historical ~ .scrubber-card { display: block; }
+
+.scrubber__row { display: flex; align-items: center; gap: 14px; }
+.scrubber__play {
+  flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%;
+  background: var(--n-800); color: var(--n-50);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+  transition: transform var(--dur-fast) var(--ease);
+}
+[data-theme="night"] .scrubber__play { background: var(--n-50); color: var(--n-800); }
+.scrubber__play:hover { transform: scale(1.06); }
+
+.scrubber__track { flex: 1; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px; background: var(--border-strong); }
+.scrubber__track::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--n-800); cursor: pointer; box-shadow: var(--shadow-card);
+}
+[data-theme="night"] .scrubber__track::-webkit-slider-thumb { background: var(--n-50); }
+
+.scrubber__time { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); flex-shrink: 0; width: 64px; text-align: right; }
+
+/* ---------- Detail panel ---------- */
+.detail-panel__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.detail-panel__title { font-size: 14px; font-weight: 600; }
+.detail-panel__subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; display: block; margin-bottom: 14px; }
+
+/* ---------- Notification panel (top-right) ---------- */
+.notif-panel { position: fixed; top: 84px; right: 22px; z-index: 500; width: 300px; }
+.notif-panel__collapsed {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  /* --pill-bg / --pill-fg are set inline (per current highest-severity
+     notification) in heatmap.js, mirroring the same pairing used by the
+     top-bar status pill, notif-row, and worker status pills — this is what
+     keeps the banner readable in both Day and Night mode instead of relying
+     on text color alone against the panel's own elevated background. */
+  background: var(--pill-bg, var(--bg-elevated)); border-radius: var(--radius-card); box-shadow: var(--shadow-elevated);
+  padding: 12px 14px; cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.notif-panel__collapsed:hover { transform: translateY(1px); }
+.notif-panel__collapsed-text { font-size: 12px; font-weight: 600; color: var(--pill-fg, var(--text)); line-height: 1.3; }
+.notif-panel__expand-hint { font-size: 11px; color: var(--text-muted); font-weight: 500; flex-shrink: 0; }
+
+.notif-panel__list {
+  display: none; margin-top: 8px; max-height: 320px; overflow-y: auto;
+  background: var(--bg-elevated); border-radius: var(--radius-card); box-shadow: var(--shadow-elevated);
+  padding: 6px;
+}
+.notif-panel.is-open .notif-panel__list { display: block; }
+.notif-panel.is-open .notif-panel__collapsed { display: none; }
+
+.notif-panel__close-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px 10px; }
+.notif-panel__title { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.notif-panel__close { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+.notif-panel__close:hover { color: var(--text); }
+
+.notif-row {
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 10px 10px; border-radius: var(--radius-sm); cursor: pointer;
+  border-left: 3px solid var(--pill-fg, var(--text-muted));
+  background: var(--pill-bg, transparent);
+  margin-bottom: 6px;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+.notif-row:last-child { margin-bottom: 0; }
+.notif-row.is-read { opacity: 0.5; }
+.notif-row__time { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+.notif-row__text { font-size: 12px; font-weight: 600; color: var(--pill-fg, var(--text)); }
