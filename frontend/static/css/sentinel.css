@@ -17,18 +17,18 @@
   --n-700: #343A40;
   --n-800: #212529;
 
-  --risk-normal:        #415D43;
+  --risk-normal:        #34a93c;
   --risk-normal-tint:   #CDE0D0;
-  --risk-caution:       #8A7530;
-  --risk-caution-tint:  #EDE3C3;
-  --risk-warning:       #965A34;
+  --risk-caution:       #f4d265;
+  --risk-caution-tint:  #fbf2d3;
+  --risk-warning:       #f57220;
   --risk-warning-tint:  #EAD0BC;
-  --risk-high:          #AD2831;
+  --risk-high:          #d01e2a;
   --risk-high-tint:     #E8C4C8;
-  --risk-critical:      #640D14;
+  --risk-critical:      #43050a;
   --risk-critical-tint: #C99BA0;
-  --risk-shutdown:      #17191B;
-  --risk-shutdown-tint: #D8D8D8;
+  --risk-shutdown:      #0e151d;
+  --risk-shutdown-tint: #d4d0d0;
 
   --font-display: 'Space Grotesk', sans-serif;
   --font-body: 'IBM Plex Sans', sans-serif;
@@ -44,7 +44,7 @@
 }
 
 :root, [data-theme="day"] {
-  --bg: #F2F4EF;
+  --bg: hsl(84, 19%, 95%);
   --bg-elevated: #FFFFFF;
   --bg-sunken: #E9ECE5;
   --text: var(--n-800);

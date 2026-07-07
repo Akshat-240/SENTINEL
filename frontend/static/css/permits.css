@@ -1,0 +1,112 @@
+/* ==========================================================================
+   SENTINEL — permits.html
+   Built on top of sentinel.css tokens/components (.card, .topbar, etc).
+   Status indicator intentionally KEEPS the left-border-stripe treatment
+   instead of the shared .pill badge — sentinel_frontend.md names permits.html
+   explicitly for that pattern, so it's a deliberate exception to the v2 pivot.
+   ========================================================================== */
+
+.permits-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 22px 100px;
+}
+
+.permits-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.permits-header h1 {
+  font-size: 24px;
+}
+
+.permits-summary {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.permits-summary strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Section blocks — blocked first, always */
+.permit-section {
+  margin-bottom: 32px;
+}
+
+.permit-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.permit-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Card — reuses .card's radius/shadow/bg, adds the left-border-stripe */
+.permit-card {
+  border-left: 4px solid var(--n-300);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.permit-card.status-blocked { border-left-color: var(--risk-high); }
+.permit-card.status-flagged { border-left-color: var(--risk-warning); }
+.permit-card.status-active  { border-left-color: var(--risk-normal); }
+
+.permit-card-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.permit-card-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.permit-card-meta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Regulatory Shadow Twin explanation text — always neutral, never colored,
+   even on a blocked card. Only the left border carries the risk color. */
+.permit-card-reason {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  max-width: 68ch;
+}
+
+.permit-card-rule {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Empty state, consistent with worker-panel__empty elsewhere in the app */
+.permits-empty {
+  text-align: center;
+  padding: 28px 16px;
+  color: var(--text-muted);
+  font-size: 13px;
+}

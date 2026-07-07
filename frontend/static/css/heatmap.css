@@ -145,5 +145,10 @@ html[data-theme="night"] .leaflet-tile-pane {
 }
 .notif-row:last-child { margin-bottom: 0; }
 .notif-row.is-read { opacity: 0.5; }
-.notif-row__time { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+.notif-row__time {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--pill-fg, var(--text-muted));
+  opacity: 0.65;
+}
 .notif-row__text { font-size: 12px; font-weight: 600; color: var(--pill-fg, var(--text)); }
