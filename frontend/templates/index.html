@@ -69,11 +69,14 @@
       <section class="card trend-panel">
         <div class="trend-panel__header">
           <span class="trend-panel__title">Temperature Trend</span>
-          <div class="trend-panel__zones">
-            <button class="temp-panel__zone-btn is-active" data-zone="A">A</button>
-            <button class="temp-panel__zone-btn" data-zone="B">B</button>
-            <button class="temp-panel__zone-btn" data-zone="C">C</button>
-            <button class="temp-panel__zone-btn" data-zone="D">D</button>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+            <div class="trend-panel__zones" id="tempZoneButtons">
+              <button class="temp-panel__zone-btn is-active" data-zone="A">A</button>
+              <button class="temp-panel__zone-btn" data-zone="B">B</button>
+              <button class="temp-panel__zone-btn" data-zone="C">C</button>
+              <button class="temp-panel__zone-btn" data-zone="D">D</button>
+            </div>
+            <a class="heatmap-teaser__link" href="heatmap.html" style="padding:6px 12px; font-size:11px;">View Heatmap</a>
           </div>
         </div>
         <div class="trend-panel__chart" id="tempTrendChart"></div>
@@ -83,11 +86,11 @@
       <section class="card trend-panel">
         <div class="trend-panel__header">
           <span class="trend-panel__title">Gas Trend</span>
-          <div class="trend-panel__zones">
-            <button class="trend-panel__zone-btn" data-zone="A">A</button>
-            <button class="trend-panel__zone-btn is-active" data-zone="B">B</button>
-            <button class="trend-panel__zone-btn" data-zone="C">C</button>
-            <button class="trend-panel__zone-btn" data-zone="D">D</button>
+          <div class="trend-panel__zones" id="gasZoneButtons">
+            <button class="temp-panel__zone-btn" data-zone="A">A</button>
+            <button class="temp-panel__zone-btn is-active" data-zone="B">B</button>
+            <button class="temp-panel__zone-btn" data-zone="C">C</button>
+            <button class="temp-panel__zone-btn" data-zone="D">D</button>
           </div>
         </div>
         <div class="trend-panel__chart" id="trendChart"></div>

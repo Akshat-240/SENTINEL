@@ -7,28 +7,13 @@
 (function () {
   'use strict';
 
-  /* ------------------------------------------------------------------------
-     MOCK DATA BLOCK — replace this whole block with real API calls
-     (/api/risk, /api/trend, /api/workers, /api/replay) once the backend is
-     ready. Everything below this block (rendering, modes, detail panel,
-     notifications) reads only from TICKS / buildZoneData / highestRiskZoneId,
-     so swapping the data source later shouldn't require touching that logic.
-     ------------------------------------------------------------------------ */
-
-  // Real-world plant bounding box (Visakhapatnam Steel Plant, Gajuwaka).
-  // Center ~17.6128, 83.1919. Zones placed within the plant's real lat/lng span.
   const ZONE_COORDS = {
-    A: { lat: 17.6210, lng: 83.1840 }, // NW
-    B: { lat: 17.6230, lng: 83.2020 }, // NE
-    C: { lat: 17.6040, lng: 83.1860 }, // SW
-    D: { lat: 17.6060, lng: 83.2040 }, // SE
+    A: { lat: 17.6210, lng: 83.1840 },
+    B: { lat: 17.6230, lng: 83.2020 },
+    C: { lat: 17.6040, lng: 83.1860 },
+    D: { lat: 17.6060, lng: 83.2040 },
   };
 
-  // Secondary, human-readable facility-area names. Zone A/B/C/D remain the
-  // canonical identifiers everywhere else in the app (Dashboard, Replay,
-  // Report, Alerts, Permits, notifications, top status bar). These names are
-  // surfaced ONLY on this page: in the map zone labels and the Zone Detail
-  // panel header — see renderMapLayer() and renderDetailPanel().
   const ZONE_AREA_NAME = {
     A: 'Sinter Plant',
     B: 'Coke Oven Battery',
@@ -36,8 +21,7 @@
     D: 'Steel Melt Shop',
   };
 
-  const SENSOR_OFFSET = { lat: 0.0015, lng: 0.0018 }; // sensor marker sits just off zone center
-  const PLANT_CENTER = { lat: 17.6128, lng: 83.1919 };
+  const SENSOR_OFFSET = { lat: 0.0015, lng: 0.0018 };
 
   function factorsFor(gas, temp, permits) {
     return [
@@ -47,9 +31,6 @@
     ];
   }
 
-  // One scripted incident timeline (mock, deterministic). Each tick = one
-  // 30-second snapshot. Zone B escalates Normal -> Shutdown, matching the
-  // Module 10 example in the blueprint. Zones A/C/D stay mostly quiet.
   const TICKS = [
     {
       time: '09:01', event: null,
@@ -154,7 +135,7 @@
       out[zid] = {
         id: zid,
         name: `Zone ${zid}`,
-        area: ZONE_AREA_NAME[zid], // secondary facility-area name — heatmap page only
+        area: ZONE_AREA_NAME[zid],
         score: z.score,
         level: z.level,
         levelLabel: LEVEL_LABEL[z.level],
@@ -175,14 +156,9 @@
       const zRank = LEVEL_ORDER.indexOf(z.level);
       const bRank = LEVEL_ORDER.indexOf(best.level);
       if (zRank > bRank || (zRank === bRank && z.score > best.score)) best = z;
-      // tie-break on id order A->B->C->D handled by object key iteration order
     });
     return best ? best.id : 'A';
   }
-
-  /* ------------------------------------------------------------------------
-     END MOCK DATA BLOCK
-     ------------------------------------------------------------------------ */
 
   const LEVEL_VAR = {
     normal: '--risk-normal', caution: '--risk-caution', warning: '--risk-warning',
@@ -192,45 +168,56 @@
     normal: '--risk-normal-tint', caution: '--risk-caution-tint', warning: '--risk-warning-tint',
     high: '--risk-high-tint', critical: '--risk-critical-tint', shutdown: '--risk-shutdown-tint',
   };
-  const NOTIFY_THRESHOLD_RANK = LEVEL_ORDER.indexOf('high'); // High Risk and above trigger the collapsed banner
+  const NOTIFY_THRESHOLD_RANK = LEVEL_ORDER.indexOf('high');
 
   // ---------- State ----------
-  let mode = 'live';                 // 'live' | 'historical'
-  let liveTickIndex = tickCount - 1; // Live always mirrors the latest scripted tick (holds at last for demo)
-  let viewTickIndex = tickCount - 1; // What's currently rendered (follows live, or scrubbed position)
-  let pinnedZoneId = null;           // User's manual selection; null = follow highest-risk
+  let mode = 'live';
+  let liveTickIndex = tickCount - 1;
+  let viewTickIndex = tickCount - 1;
+  let pinnedZoneId = null;
   let isPlaying = false;
   let playTimer = null;
-  const notifications = [];          // { id, time, zoneId, level, text, read }
-  let lastNotifiedLevelByZone = {};  // zoneId -> level, to avoid duplicate notifications per tick
+  const notifications = [];
+  let lastNotifiedLevelByZone = {};
 
   let map, zoneLayers = {}, workerMarkers = [], sensorMarkers = [], zoneLabels = [];
+  let defaultBounds = null; // computed once from ZONE_COORDS, used by both recenter's fitBounds and the visibility check// computed once from ZONE_COORDS, used by recenter + visibility check
 
   // ---------- Map init ----------
   function initMap() {
-    map = L.map('mapSurface', { zoomControl: true, minZoom: 13, maxZoom: 19 })
-      .setView([PLANT_CENTER.lat, PLANT_CENTER.lng], 16);
+  map = L.map('mapSurface', { zoomControl: true, minZoom: 13, maxZoom: 19 });
 
-    // Voyager: muted like Positron, but denser road/building labels —
-    // easier to orient on an industrial site than the plainer Positron tiles.
-    // Night-mode dimming is handled purely in CSS (see heatmap.css) via a
-    // `filter` applied to .leaflet-tile-pane, scoped to [data-theme="night"].
-    // That keeps the tile layer itself theme-agnostic and means the dim
-    // effect flips instantly whenever the existing theme toggle updates
-    // data-theme on <html> — no extra JS wiring needed here.
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-      subdomains: 'abcd',
-      maxZoom: 20,
-    }).addTo(map);
-  }
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+    subdomains: 'abcd',
+    maxZoom: 20,
+  }).addTo(map);
+
+  // Bounds that contain every zone's coordinate — the source of truth for
+  // both the initial view and what "recenter" returns to.
+  defaultBounds = L.latLngBounds(Object.values(ZONE_COORDS).map((c) => [c.lat, c.lng]));
+map.fitBounds(defaultBounds, { padding: [50, 50] });
+
+// Both pan and zoom can push zones out of view, so both should surface Recenter.
+map.on('moveend zoomend', updateRecenterVisibility);
+}
+
+  function updateRecenterVisibility() {
+  const btn = document.getElementById('recenterBtn');
+  if (!btn || !map || !defaultBounds) return;
+  const showsAllZones = map.getBounds().contains(defaultBounds);
+  btn.style.display = showsAllZones ? 'none' : 'flex';
+}
+
+function recenterMap() {
+  map.fitBounds(defaultBounds, { padding: [50, 50] });
+}
 
   function colorFor(level) {
     return getComputedStyle(document.documentElement).getPropertyValue(LEVEL_VAR[level]).trim();
   }
 
   function renderMapLayer(zoneData) {
-    // Clear previous layer objects
     Object.values(zoneLayers).forEach((l) => map.removeLayer(l));
     workerMarkers.forEach((m) => map.removeLayer(m));
     sensorMarkers.forEach((m) => map.removeLayer(m));
@@ -240,7 +227,6 @@
     Object.values(zoneData).forEach((zone) => {
       const accent = colorFor(zone.level);
 
-      // Zone polygon (simple circle standing in for a real facility footprint)
       const circle = L.circle([zone.coords.lat, zone.coords.lng], {
         radius: 550,
         color: accent,
@@ -251,10 +237,6 @@
       circle.on('click', () => selectZone(zone.id));
       zoneLayers[zone.id] = circle;
 
-      // Zone label — Zone ID + facility-area name + risk level, e.g.
-      // "Zone B · Coke Oven Battery · High Risk". The area name is shown
-      // here (map only) as a secondary label; Zone A/B/C/D stays the
-      // identifier everywhere else in the app.
       const label = L.marker([zone.coords.lat, zone.coords.lng], {
         icon: L.divIcon({
           className: '', html: `<div class="zone-label">${zone.name} · ${zone.area} · ${zone.levelLabel}</div>`,
@@ -264,7 +246,6 @@
       label.on('click', () => selectZone(zone.id));
       zoneLabels.push(label);
 
-      // Sensor marker (square, muted) — one per zone
       const sensor = L.marker([zone.sensorCoords.lat, zone.sensorCoords.lng], {
         icon: L.divIcon({
           className: '', html: `<div class="map-square" style="width:10px;height:10px;background:${accent};opacity:0.6"></div>`,
@@ -273,7 +254,6 @@
       }).addTo(map);
       sensorMarkers.push(sensor);
 
-      // Worker markers — colored by that worker's own urgency, offset slightly around zone center
       zone.workers.forEach((w, i) => {
         const wAccent = colorFor(w.accent);
         const angle = (i / Math.max(zone.workers.length, 1)) * Math.PI * 2;
@@ -335,7 +315,7 @@
     isPlaying = true;
 
     if (viewTickIndex >= tickCount - 1) {
-      viewTickIndex = 0; // restart from beginning if already at the end
+      viewTickIndex = 0;
       notifications.length = 0;
       lastNotifiedLevelByZone = {};
     }
@@ -350,7 +330,7 @@
         return;
       }
       renderAll();
-    }, 1500); // ~1.5s per snapshot, compressed playback
+    }, 1500);
   }
 
   function stopPlay() {
@@ -368,44 +348,65 @@
   }
 
   function currentDisplayedZoneId(zoneData) {
-    if (isPlaying) return highestRiskZoneId(zoneData); // Play mode: auto-follow the story
+    if (isPlaying) return highestRiskZoneId(zoneData);
     if (pinnedZoneId && zoneData[pinnedZoneId]) return pinnedZoneId;
-    return highestRiskZoneId(zoneData); // default on load: highest-risk (or A if all normal)
+    return highestRiskZoneId(zoneData);
+  }
+
+  function sortedZoneList(zoneData) {
+    return Object.values(zoneData).sort((a, b) => {
+      const rankA = LEVEL_ORDER.indexOf(a.level);
+      const rankB = LEVEL_ORDER.indexOf(b.level);
+      if (rankB !== rankA) return rankB - rankA;
+      return b.score - a.score;
+    });
   }
 
   function renderDetailPanel() {
     const zoneData = buildZoneData(viewTickIndex);
-    const zid = currentDisplayedZoneId(zoneData);
-    const zone = zoneData[zid];
-    const accent = `var(${LEVEL_VAR[zone.level]})`;
+    const zones = sortedZoneList(zoneData);
+    const selectedId = currentDisplayedZoneId(zoneData);
 
-    document.getElementById('detailSubtitle').textContent = isPlaying
-      ? 'Following highest-risk zone during playback'
-      : (pinnedZoneId ? 'Pinned to your selection' : 'Showing highest-risk zone');
+    document.getElementById('detailSubtitle').textContent = 'All zones · Most critical on top';
 
-    const factorsHtml = zone.factors.map((f) => `<div class="factor-row"><span>${f.label}</span><span>${f.value}</span></div>`).join('');
-    const workersHtml = zone.workers.length
-      ? zone.workers.map((w) => `
-          <div class="worker-mini-row">
-            <span class="worker-mini-row__id">${w.id}</span>
-            <span class="pill" style="--pill-bg: var(${LEVEL_TINT_VAR[w.accent]}); --pill-fg: var(${LEVEL_VAR[w.accent]});">${w.status}</span>
-          </div>`).join('')
-      : `<p style="font-size:12px;color:var(--text-muted)">No workers currently in this zone.</p>`;
+    const cardsHtml = zones.map((zone) => {
+      const accent = `var(${LEVEL_VAR[zone.level]})`;
+      const isSelected = zone.id === selectedId;
 
-    document.getElementById('detailPanelBody').innerHTML = `
-      <div class="zone-card__expanded-header" style="margin-bottom:14px;">
-        <h3 style="font-size:18px;">${zone.name} · ${zone.area}</h3>
-        <span class="pill" style="--pill-bg: var(${LEVEL_TINT_VAR[zone.level]}); --pill-fg: var(${LEVEL_VAR[zone.level]});">
-          <span class="pill__dot"></span>${zone.levelLabel} · ${zone.score}
-        </span>
-      </div>
-      <div class="zone-card__section-title" style="margin-top:0;">${zone.level === 'normal' ? 'Current conditions' : "Why it's alerting"}</div>
-      ${factorsHtml}
-      <div class="expanded-divider"></div>
-      <div class="zone-card__section-title">${zone.level === 'normal' ? 'Workers in zone' : "Who's at risk"}</div>
-      ${workersHtml}
-    `;
-    document.querySelector('.detail-panel').style.setProperty('--card-accent', accent);
+      const factorsHtml = zone.factors
+        .map((f) => `<div class="factor-row"><span>${f.label}</span><span>${f.value}</span></div>`)
+        .join('');
+
+      const workersHtml = zone.workers.length
+        ? zone.workers.map((w) => `
+            <div class="worker-mini-row">
+              <span class="worker-mini-row__id">${w.id}</span>
+              <span class="pill" style="--pill-bg: var(${LEVEL_TINT_VAR[w.accent]}); --pill-fg: var(${LEVEL_VAR[w.accent]});">${w.status}</span>
+            </div>`).join('')
+        : `<p style="font-size:12px;color:var(--text-muted)">No workers currently in this zone.</p>`;
+
+      return `
+        <div class="zone-detail-card ${isSelected ? 'is-selected' : ''}" data-zone="${zone.id}" style="--card-accent:${accent}">
+          <div class="zone-card__expanded-header" style="margin-bottom:14px;">
+            <h3 style="font-size:16px;">${zone.name} · ${zone.area}</h3>
+            <span class="pill" style="--pill-bg: var(${LEVEL_TINT_VAR[zone.level]}); --pill-fg: var(${LEVEL_VAR[zone.level]});">
+              <span class="pill__dot"></span>${zone.levelLabel} · ${zone.score}
+            </span>
+          </div>
+          <div class="zone-card__section-title" style="margin-top:0;">${zone.level === 'normal' ? 'Current conditions' : "Why it's alerting"}</div>
+          ${factorsHtml}
+          <div class="expanded-divider"></div>
+          <div class="zone-card__section-title">${zone.level === 'normal' ? 'Workers in zone' : "Who's at risk"}</div>
+          ${workersHtml}
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('detailPanelBody').innerHTML = `<div class="zone-detail-list">${cardsHtml}</div>`;
+
+    document.querySelectorAll('.zone-detail-card').forEach((card) => {
+      card.addEventListener('click', () => selectZone(card.dataset.zone));
+    });
   }
 
   // ---------- Notifications ----------
@@ -420,7 +421,6 @@
           time: TICKS[viewTickIndex].time,
           zoneId: zone.id,
           level: zone.level,
-          // Notifications intentionally stay on Zone A/B/C/D only — no area name.
           text: `${zone.name} is now ${zone.levelLabel}.`,
           read: false,
         });
@@ -445,17 +445,10 @@
     panel.style.display = 'block';
 
     const latest = notifications[0];
-    // Use the same --pill-bg / --pill-fg pairing as every other pill in the
-    // app (top-bar status pill, notif-row, worker status pill) instead of
-    // only setting text color. That pairing is what keeps those other pills
-    // legible in night mode — setting foreground alone left this banner's
-    // text sitting directly on the dark panel background with too little
-    // contrast.
     const collapsedEl = document.getElementById('notifCollapsedOpen');
     collapsedEl.style.setProperty('--pill-bg', `var(${LEVEL_TINT_VAR[latest.level]})`);
     collapsedEl.style.setProperty('--pill-fg', `var(${LEVEL_VAR[latest.level]})`);
-    collapsedText.textContent = latest.text;
-    collapsedText.style.color = '';
+    collapsedText.innerHTML = `<span class="pill__dot"></span>${latest.text}`;
 
     list.innerHTML = notifications.map((n) => `
       <div class="notif-row ${n.read ? 'is-read' : ''}" data-zone="${n.zoneId}"
@@ -497,6 +490,7 @@
       enterHistoricalFromScrub(parseInt(e.target.value, 10));
     });
     document.getElementById('playBtn').addEventListener('click', togglePlay);
+    document.getElementById('recenterBtn').addEventListener('click', recenterMap);
   }
 
   // ---------- Init ----------

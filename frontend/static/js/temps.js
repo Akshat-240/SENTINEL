@@ -40,10 +40,12 @@
     wireZoneButtons();
   }
 
+  // Scoped to #tempZoneButtons so Gas Trend's buttons (same CSS class,
+  // different panel) are never picked up here.
   function wireZoneButtons() {
-    document.querySelectorAll('.temp-panel__zone-btn').forEach((btn) => {
+    document.querySelectorAll('#tempZoneButtons .temp-panel__zone-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.temp-panel__zone-btn').forEach((b) => b.classList.remove('is-active'));
+        document.querySelectorAll('#tempZoneButtons .temp-panel__zone-btn').forEach((b) => b.classList.remove('is-active'));
         btn.classList.add('is-active');
         activeZone = btn.dataset.zone;
         drawBars(activeZone);
@@ -63,13 +65,13 @@
     const plotW = w - padLeft;
     const plotH = h - padBottom;
 
-    // Fixed, sensible scale rather than auto-fit-to-data — a chart whose
-    // axis rescales every time you switch zones is harder to read at a
-    // glance. 20-70°C covers the realistic sensor range with headroom.
+    // Dynamic scale: fits the data range per zone (with headroom), so no
+    // bar can ever exceed the plot area regardless of how hot a zone runs.
     const dataMax = Math.max(...data);
     const dataMin = Math.min(...data);
     const scaleMin = Math.max(0, Math.floor(dataMin / 10) * 10 - 10);
     const scaleMax = Math.ceil((dataMax + 5) / 10) * 10;
+
     const gridLines = [];
     for (let v = scaleMin; v <= scaleMax; v += 10) gridLines.push(v);
 
