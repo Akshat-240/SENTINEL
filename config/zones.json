@@ -1,40 +1,11 @@
-{
-  "zones": [
-    {
-      "zone_id": "zone_a",
-      "zone_name": "Furnace & Casting Bay",
-      "lat": 17.6868,
-      "lng": 83.2185,
-      "history_score": 3
-    },
-    {
-      "zone_id": "zone_b",
-      "zone_name": "Gas Storage / Confined Space",
-      "lat": 17.6872,
-      "lng": 83.2201,
-      "history_score": 8
-    },
-    {
-      "zone_id": "zone_c",
-      "zone_name": "Hot Work / Welding Bay",
-      "lat": 17.6879,
-      "lng": 83.2193,
-      "history_score": 6
-    },
-    {
-      "zone_id": "zone_d",
-      "zone_name": "Electrical Substation",
-      "lat": 17.6875,
-      "lng": 83.2178,
-      "history_score": 2
-    }
-  ]
-}
 [
   {
-    "zone_id": "ZONE_A",
+    "zone_id": "zone_a",
     "name": "Coke Oven Battery",
+    "zone_name": "Furnace & Casting Bay",
     "description": "Primary coal heating and coke production facility",
+    "lat": 17.6868,
+    "lng": 83.2185,
     "coordinates": {
       "lat": 17.6868,
       "lng": 83.2185
@@ -44,14 +15,17 @@
     "hazard_type": "GAS",
     "history_score": 9,
     "adjacent_zones": [
-      "ZONE_E",
-      "ZONE_B"
+      "zone_e",
+      "zone_b"
     ]
   },
   {
-    "zone_id": "ZONE_B",
+    "zone_id": "zone_b",
     "name": "Gas Processing Unit",
+    "zone_name": "Gas Storage / Confined Space",
     "description": "Refining and distribution of by-product gases",
+    "lat": 17.6872,
+    "lng": 83.2201,
     "coordinates": {
       "lat": 17.6865,
       "lng": 83.2188
@@ -61,15 +35,18 @@
     "hazard_type": "GAS",
     "history_score": 7,
     "adjacent_zones": [
-      "ZONE_A",
-      "ZONE_C",
-      "ZONE_D"
+      "zone_a",
+      "zone_c",
+      "zone_d"
     ]
   },
   {
-    "zone_id": "ZONE_C",
+    "zone_id": "zone_c",
     "name": "Blast Furnace Area",
+    "zone_name": "Hot Work / Welding Bay",
     "description": "Iron smelting and hot metal production zone",
+    "lat": 17.6879,
+    "lng": 83.2193,
     "coordinates": {
       "lat": 17.6860,
       "lng": 83.2180
@@ -79,15 +56,18 @@
     "hazard_type": "HEAT",
     "history_score": 6,
     "adjacent_zones": [
-      "ZONE_E",
-      "ZONE_B",
-      "ZONE_F"
+      "zone_e",
+      "zone_b",
+      "zone_f"
     ]
   },
   {
-    "zone_id": "ZONE_D",
+    "zone_id": "zone_d",
     "name": "Control Room",
+    "zone_name": "Electrical Substation",
     "description": "Central monitoring and operations command center",
+    "lat": 17.6875,
+    "lng": 83.2178,
     "coordinates": {
       "lat": 17.6855,
       "lng": 83.2192
@@ -97,14 +77,17 @@
     "hazard_type": "ELECTRICAL",
     "history_score": 1,
     "adjacent_zones": [
-      "ZONE_B",
-      "ZONE_F"
+      "zone_b",
+      "zone_f"
     ]
   },
   {
-    "zone_id": "ZONE_E",
+    "zone_id": "zone_e",
     "name": "Raw Material Storage",
+    "zone_name": "Raw Material Storage",
     "description": "Storage yard for coal, iron ore, and limestone",
+    "lat": 17.6872,
+    "lng": 83.2180,
     "coordinates": {
       "lat": 17.6872,
       "lng": 83.2180
@@ -114,14 +97,17 @@
     "hazard_type": "CHEMICAL",
     "history_score": 4,
     "adjacent_zones": [
-      "ZONE_A",
-      "ZONE_C"
+      "zone_a",
+      "zone_c"
     ]
   },
   {
-    "zone_id": "ZONE_F",
+    "zone_id": "zone_f",
     "name": "Electrical Substation",
+    "zone_name": "Electrical Substation",
     "description": "High voltage power distribution facility",
+    "lat": 17.6855,
+    "lng": 83.2182,
     "coordinates": {
       "lat": 17.6855,
       "lng": 83.2182
@@ -131,8 +117,8 @@
     "hazard_type": "ELECTRICAL",
     "history_score": 5,
     "adjacent_zones": [
-      "ZONE_C",
-      "ZONE_D"
+      "zone_c",
+      "zone_d"
     ]
   }
 ]
