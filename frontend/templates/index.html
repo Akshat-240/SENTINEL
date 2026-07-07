@@ -2,6 +2,16 @@
 <html lang="en" data-theme="day">
 <head>
   <meta charset="UTF-8" />
+  <script>
+  (function () {
+    try {
+      var theme = localStorage.getItem('sentinel_theme');
+      if (theme === 'day' || theme === 'night') {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+    } catch (e) { /* localStorage unavailable — falls back to default data-theme="day" already in the HTML */ }
+  })();
+</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SENTINEL — Dashboard</title>
   <link rel="stylesheet" href="../static/css/sentinel.css" />

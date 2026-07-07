@@ -20,6 +20,23 @@
   /* ---------- Theme toggle (day / night) ---------- */
   const THEME_KEY = 'sentinel_theme';
 
+  function getStoredTheme() {
+    try {
+      return localStorage.getItem(THEME_KEY);
+    } catch (e) {
+      // localStorage unavailable (privacy mode, disabled storage, etc.)
+      return null;
+    }
+  }
+
+  function storeTheme(theme) {
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+    } catch (e) {
+      // Fail silently — theme just won't persist this session.
+    }
+  }
+
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     const btn = document.querySelector('.theme-toggle');
@@ -27,21 +44,18 @@
   }
 
   function initTheme() {
-    let theme = 'day';
-    try {
-      theme = window.localStorage.getItem(THEME_KEY) || 'day';
-    } catch (_) {
-      theme = 'day';
-    }
-    if (theme !== 'night') theme = 'day';
-
+// The inline head-script already applied the
+// correct theme to <html> before paint, to avoid a flash.
+// Here we just read that same value back so the toggle button
+// label and stored state agree with what's on screen.
+let theme = document.documentElement.getAttribute('data-theme') || getStoredTheme() || 'day';
     applyTheme(theme);
 
     const btn = document.querySelector('.theme-toggle');
     if (btn) {
       btn.addEventListener('click', () => {
         theme = theme === 'day' ? 'night' : 'day';
-        try { window.localStorage.setItem(THEME_KEY, theme); } catch (_) {}
+        storeTheme(theme);
         applyTheme(theme);
       });
     }
