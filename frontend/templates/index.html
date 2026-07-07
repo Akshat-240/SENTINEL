@@ -58,7 +58,7 @@
       </div>
     </aside>
 
-    <!-- MIDDLE COLUMN — Alert Panel / Heatmap Teaser / Trend Graph -->
+    <!-- MIDDLE COLUMN — Alert Panel / Temperature Trend / Gas Trend -->
     <main class="main-column">
 
       <section>
@@ -66,12 +66,18 @@
         <div class="alert-grid" id="alertGrid"></div>
       </section>
 
-      <section class="card">
-        <div class="heatmap-teaser__header">
-          <span class="heatmap-teaser__title">Plant Heatmap</span>
-          <a class="heatmap-teaser__link" href="heatmap.html">View full map</a>
+      <section class="card trend-panel">
+        <div class="trend-panel__header">
+          <span class="trend-panel__title">Temperature Trend</span>
+          <div class="trend-panel__zones">
+            <button class="temp-panel__zone-btn is-active" data-zone="A">A</button>
+            <button class="temp-panel__zone-btn" data-zone="B">B</button>
+            <button class="temp-panel__zone-btn" data-zone="C">C</button>
+            <button class="temp-panel__zone-btn" data-zone="D">D</button>
+          </div>
         </div>
-        <div class="floorplan" id="heatmapTeaserPreview"></div>
+        <div class="trend-panel__chart" id="tempTrendChart"></div>
+        <div class="temp-panel__keypoints" id="tempTrendKeypoints"></div>
       </section>
 
       <section class="card trend-panel">
@@ -110,6 +116,7 @@
 
   <script src="../static/js/common.js"></script>
   <script src="../static/js/alerts.js"></script>
+  <script src="../static/js/temps.js"></script>
   <script src="../static/js/trends.js"></script>
   <script src="../static/js/workers.js"></script>
 </body>

@@ -255,8 +255,19 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
 .trend-panel__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .trend-panel__title { font-size: 14px; font-weight: 600; }
 .trend-panel__zones { display: flex; gap: 4px; background: var(--bg-sunken); padding: 3px; border-radius: var(--radius-pill); }
-.trend-panel__zone-btn { font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: var(--radius-pill); color: var(--text-muted); transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease); }
-.trend-panel__zone-btn.is-active { background: var(--bg-elevated); color: var(--text); box-shadow: var(--shadow-card); }
+.temp-panel__zone-btn {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.temp-panel__zone-btn.is-active {
+  background: var(--bg-elevated);
+  color: var(--text);
+  box-shadow: var(--shadow-card);
+}
 
 .trend-panel__chart { position: relative; height: 170px; margin-bottom: 6px; }
 .trend-panel__tooltip {
