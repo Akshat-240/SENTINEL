@@ -283,7 +283,7 @@
         : `<p style="font-size:12px;color:var(--text-muted)">No workers currently in this zone.</p>`;
 
       return `
-        <div class="zone-detail-card ${isSelected ? 'is-selected' : ''}" data-zone="${zone.id}" style="--card-accent:${accent}">
+        <div class="zone-detail-card ${isSelected ? 'is-selected' : ''}" data-zone="${zone.id}" style="--card-accent:${accent}" tabindex="0" role="button" aria-pressed="${isSelected}">
           <div class="zone-card__expanded-header" style="margin-bottom:14px;">
             <h3 style="font-size:16px;">${zone.name} · ${zone.area}</h3>
             <span class="pill" style="--pill-bg: var(${LEVEL_TINT_VAR[zone.level]}); --pill-fg: var(${LEVEL_VAR[zone.level]});">
@@ -303,6 +303,12 @@
 
     document.querySelectorAll('.zone-detail-card').forEach((card) => {
       card.addEventListener('click', () => selectZone(card.dataset.zone));
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          selectZone(card.dataset.zone);
+        }
+      });
     });
   }
 
