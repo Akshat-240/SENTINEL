@@ -23,11 +23,11 @@
   --risk-caution-tint:  #fbf2d3;
   --risk-warning:       #f57220;
   --risk-warning-tint:  #EAD0BC;
-  --risk-high:          #d01e2a;
+  --risk-high:          #e90010;
   --risk-high-tint:     #E8C4C8;
-  --risk-critical:      #43050a;
+  --risk-critical:      #5b020a;
   --risk-critical-tint: #C99BA0;
-  --risk-shutdown:      #0e151d;
+  --risk-shutdown:      #5d5a5a;
   --risk-shutdown-tint: #d4d0d0;
 
   --font-display: 'Space Grotesk', sans-serif;
