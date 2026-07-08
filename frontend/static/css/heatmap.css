@@ -31,10 +31,14 @@
   font-size: 12px; font-weight: 600; color: var(--text);
   background: var(--bg-sunken); padding: 7px 14px; border-radius: var(--radius-pill);
   transition: background var(--dur-fast) var(--ease);
-  display: none;
 }
-.mode-bar.is-historical .mode-bar__return { display: inline-flex; }
 .mode-bar__return:hover { background: var(--border-strong); }
+
+.scrubber__return-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
 
 /* ---------- Map card ---------- */
 .map-card { padding: 0; overflow: hidden; position: relative; z-index: 1; }

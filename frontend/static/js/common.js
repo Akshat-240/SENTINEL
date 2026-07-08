@@ -60,7 +60,80 @@ let theme = document.documentElement.getAttribute('data-theme') || getStoredThem
       });
     }
   }
+  /* ---------- Replay Mode (global state, mirrors theme's localStorage pattern) ----------
+     State shape in localStorage:
+       { mode: 'live' }
+       { mode: 'replay', timestamp: '09:10' }
+     Any page can call SentinelReplay.enter(timestamp) to freeze the whole
+     app at that moment, and SentinelReplay.resumeLive() to snap back —
+     from anywhere, since this lives in common.js like the theme toggle.
+  */
+  const REPLAY_KEY = 'sentinel_replay_state';
 
+  function getReplayState() {
+    try {
+      const raw = localStorage.getItem(REPLAY_KEY);
+      if (!raw) return { mode: 'live' };
+      const parsed = JSON.parse(raw);
+      return parsed && parsed.mode ? parsed : { mode: 'live' };
+    } catch (e) {
+      return { mode: 'live' }; // localStorage unavailable — default to live
+    }
+  }
+
+  function storeReplayState(state) {
+    try {
+      localStorage.setItem(REPLAY_KEY, JSON.stringify(state));
+    } catch (e) {
+      // Fail silently — replay just won't persist across pages this session.
+    }
+  }
+
+  function enterReplay(timestamp) {
+    storeReplayState({ mode: 'replay', timestamp });
+    renderReplayBar();
+    document.dispatchEvent(new CustomEvent('sentinel:replay-changed', { detail: getReplayState() }));
+  }
+
+  function resumeLive() {
+    storeReplayState({ mode: 'live' });
+    renderReplayBar();
+    document.dispatchEvent(new CustomEvent('sentinel:replay-changed', { detail: getReplayState() }));
+  }
+
+  // Renders the top-bar indicator: normal Live pill vs "Replay • [time]" +
+  // a Resume Live button. Expects the topbar to have a #globalReplayBar
+  // container (see markup snippet) — falls back to no-op if it's missing,
+  // so pages that haven't added the markup yet don't break.
+  function renderReplayBar() {
+    const bar = document.getElementById('globalReplayBar');
+    if (!bar) return;
+    const state = getReplayState();
+
+    if (state.mode === 'replay') {
+      bar.innerHTML = `
+        <span class="pill replay-pill">
+          <span class="pill__dot"></span>Replay &middot; ${state.timestamp}
+        </span>
+        <button class="mode-bar__return" id="globalResumeLiveBtn" type="button">Resume Live</button>
+      `;
+      const btn = document.getElementById('globalResumeLiveBtn');
+      if (btn) btn.addEventListener('click', resumeLive);
+    } else {
+      bar.innerHTML = `
+        <span class="pill" style="--pill-bg: var(--risk-normal-tint); --pill-fg: var(--risk-normal);">
+          <span class="pill__dot"></span>Live
+        </span>
+      `;
+    }
+  }
+
+  window.SentinelReplay = {
+    getState: getReplayState,
+    enter: enterReplay,
+    resumeLive,
+    isReplay: () => getReplayState().mode === 'replay',
+  };
   /* ---------- Live clock, 24hr with seconds ---------- */
   function pad(n) { return n.toString().padStart(2, '0'); }
 

@@ -2,24 +2,14 @@
    SENTINEL — heatmap.js
    Leaflet map (CartoDB Voyager) + zone polygons + worker/sensor markers +
    Live/Historical/Play modes + detail panel + top-right notification panel.
+   Data (TICKS, ZONE_COORDS, etc.) lives in data.js — this file is
+   rendering/interaction logic only.
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  const ZONE_COORDS = {
-    A: { lat: 17.6210, lng: 83.1840 },
-    B: { lat: 17.6230, lng: 83.2020 },
-    C: { lat: 17.6040, lng: 83.1860 },
-    D: { lat: 17.6060, lng: 83.2040 },
-  };
-
-  const ZONE_AREA_NAME = {
-    A: 'Sinter Plant',
-    B: 'Coke Oven Battery',
-    C: 'Blast Furnace Area',
-    D: 'Steel Melt Shop',
-  };
+  const { TICKS, ZONE_COORDS, ZONE_AREA_NAME, LEVEL_ORDER, LEVEL_LABEL, LEVEL_VAR, LEVEL_TINT_VAR } = window.SENTINEL_DATA;
 
   const SENSOR_OFFSET = { lat: 0.0015, lng: 0.0018 };
 
@@ -31,101 +21,7 @@
     ];
   }
 
-  const TICKS = [
-    {
-      time: '09:01', event: null,
-      zones: {
-        A: { score: 12, level: 'normal', gas: 18, temp: 31, permits: 'None active', workers: [] },
-        B: { score: 12, level: 'normal', gas: 20, temp: 33, permits: 'None active', workers: [] },
-        C: { score: 22, level: 'normal', gas: 130, temp: 39, permits: 'Electrical', workers: [] },
-        D: { score: 15, level: 'normal', gas: 12, temp: 29, permits: 'None active', workers: [] },
-      },
-    },
-    {
-      time: '09:05', event: null,
-      zones: {
-        A: { score: 14, level: 'normal', gas: 19, temp: 31, permits: 'None active', workers: [] },
-        B: { score: 18, level: 'normal', gas: 45, temp: 36, permits: 'None active', workers: [] },
-        C: { score: 24, level: 'normal', gas: 138, temp: 39, permits: 'Electrical', workers: [] },
-        D: { score: 15, level: 'normal', gas: 12, temp: 29, permits: 'None active', workers: [] },
-      },
-    },
-    {
-      time: '09:07', event: 'Permit Issued — Zone B (Hot Work)',
-      zones: {
-        A: { score: 14, level: 'normal', gas: 19, temp: 31, permits: 'None active', workers: [] },
-        B: { score: 35, level: 'caution', gas: 95, temp: 42, permits: 'Hot Work', workers: [] },
-        C: { score: 27, level: 'normal', gas: 145, temp: 40, permits: 'Electrical', workers: [] },
-        D: { score: 15, level: 'normal', gas: 12, temp: 29, permits: 'None active', workers: [] },
-      },
-    },
-    {
-      time: '09:09', event: 'Worker entered Zone B',
-      zones: {
-        A: { score: 14, level: 'normal', gas: 19, temp: 31, permits: 'None active', workers: [] },
-        B: {
-          score: 61, level: 'warning', gas: 210, temp: 49, permits: 'Hot Work + Confined Space',
-          workers: [{ id: 'Worker #07', status: 'Move to safe zone', accent: 'warning', exposure: '3 min' }],
-        },
-        C: { score: 30, level: 'caution', gas: 165, temp: 41, permits: 'Electrical', workers: [] },
-        D: { score: 15, level: 'normal', gas: 12, temp: 29, permits: 'None active', workers: [] },
-      },
-    },
-    {
-      time: '09:10', event: 'Zone B gas spike detected',
-      zones: {
-        A: { score: 14, level: 'normal', gas: 19, temp: 31, permits: 'None active', workers: [] },
-        B: {
-          score: 79, level: 'high', gas: 480, temp: 55, permits: 'Hot Work + Confined Space',
-          workers: [
-            { id: 'Worker #04', status: 'Exit immediately', accent: 'high', exposure: '9 min' },
-            { id: 'Worker #07', status: 'Move to safe zone', accent: 'warning', exposure: '6 min' },
-          ],
-        },
-        C: { score: 33, level: 'caution', gas: 172, temp: 41, permits: 'Electrical', workers: [] },
-        D: { score: 15, level: 'normal', gas: 12, temp: 29, permits: 'None active', workers: [] },
-      },
-    },
-    {
-      time: '09:10:30', event: 'Compound risk bonus triggered — Hot Work + Gas > 500 PPM',
-      zones: {
-        A: { score: 14, level: 'normal', gas: 19, temp: 31, permits: 'None active', workers: [] },
-        B: {
-          score: 88, level: 'critical', gas: 610, temp: 58, permits: 'Hot Work + Confined Space',
-          workers: [
-            { id: 'Worker #04', status: 'Exit immediately', accent: 'high', exposure: '11 min' },
-            { id: 'Worker #07', status: 'Move to safe zone', accent: 'warning', exposure: '8 min' },
-            { id: 'Worker #11', status: 'Entry blocked', accent: 'high', exposure: 'Entering' },
-          ],
-        },
-        C: { score: 34, level: 'caution', gas: 174, temp: 41, permits: 'Electrical', workers: [] },
-        D: { score: 15, level: 'normal', gas: 12, temp: 29, permits: 'None active', workers: [] },
-      },
-    },
-    {
-      time: '09:11', event: 'ALERT TRIGGERED — Emergency Shutdown',
-      zones: {
-        A: { score: 16, level: 'caution', gas: 22, temp: 32, permits: 'None active', workers: [] },
-        B: {
-          score: 97, level: 'shutdown', gas: 847, temp: 63, permits: 'All permits suspended',
-          workers: [
-            { id: 'Worker #04', status: 'Exit immediately', accent: 'high', exposure: '14 min' },
-            { id: 'Worker #07', status: 'Move to safe zone', accent: 'warning', exposure: '11 min' },
-            { id: 'Worker #11', status: 'Entry blocked', accent: 'high', exposure: 'Entering' },
-          ],
-        },
-        C: { score: 36, level: 'caution', gas: 176, temp: 41, permits: 'Electrical', workers: [] },
-        D: { score: 15, level: 'normal', gas: 12, temp: 29, permits: 'None active', workers: [] },
-      },
-    },
-  ];
-
   const tickCount = TICKS.length;
-  const LEVEL_ORDER = ['normal', 'caution', 'warning', 'high', 'critical', 'shutdown'];
-  const LEVEL_LABEL = {
-    normal: 'Normal', caution: 'Caution', warning: 'Warning',
-    high: 'High Risk', critical: 'Critical', shutdown: 'Emergency Shutdown',
-  };
 
   function buildZoneData(tickIndex) {
     const tick = TICKS[tickIndex];
@@ -160,14 +56,6 @@
     return best ? best.id : 'A';
   }
 
-  const LEVEL_VAR = {
-    normal: '--risk-normal', caution: '--risk-caution', warning: '--risk-warning',
-    high: '--risk-high', critical: '--risk-critical', shutdown: '--risk-shutdown',
-  };
-  const LEVEL_TINT_VAR = {
-    normal: '--risk-normal-tint', caution: '--risk-caution-tint', warning: '--risk-warning-tint',
-    high: '--risk-high-tint', critical: '--risk-critical-tint', shutdown: '--risk-shutdown-tint',
-  };
   const NOTIFY_THRESHOLD_RANK = LEVEL_ORDER.indexOf('high');
 
   // ---------- State ----------
@@ -181,27 +69,27 @@
   let lastNotifiedLevelByZone = {};
 
   let map, zoneLayers = {}, workerMarkers = [], sensorMarkers = [], zoneLabels = [];
-  let defaultBounds = null; // computed once from ZONE_COORDS, used by both recenter's fitBounds and the visibility check// computed once from ZONE_COORDS, used by recenter + visibility check
+  let defaultBounds = null; // computed once from ZONE_COORDS, used by both recenter's fitBounds and the visibility check
 
   // ---------- Map init ----------
   function initMap() {
-  map = L.map('mapSurface', { zoomControl: true, minZoom: 13, maxZoom: 19 });
+    map = L.map('mapSurface', { zoomControl: true, minZoom: 13, maxZoom: 19 });
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-    subdomains: 'abcd',
-    maxZoom: 20,
-  }).addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+      subdomains: 'abcd',
+      maxZoom: 20,
+    }).addTo(map);
 
-  // Bounds that contain every zone's coordinate — the source of truth for
-  // both the initial view and what "recenter" returns to.
-  defaultBounds = L.latLngBounds(Object.values(ZONE_COORDS).map((c) => [c.lat, c.lng]));
-map.fitBounds(defaultBounds, { padding: [50, 50] });
-}
+    // Bounds that contain every zone's coordinate — the source of truth for
+    // both the initial view and what "recenter" returns to.
+    defaultBounds = L.latLngBounds(Object.values(ZONE_COORDS).map((c) => [c.lat, c.lng]));
+    map.fitBounds(defaultBounds, { padding: [50, 50] });
+  }
 
-function recenterMap() {
-  map.fitBounds(defaultBounds, { padding: [50, 50] });
-}
+  function recenterMap() {
+    map.fitBounds(defaultBounds, { padding: [50, 50] });
+  }
 
   function colorFor(level) {
     return getComputedStyle(document.documentElement).getPropertyValue(LEVEL_VAR[level]).trim();
@@ -328,6 +216,25 @@ function recenterMap() {
     if (playTimer) clearInterval(playTimer);
     playTimer = null;
   }
+
+  // ---------- Global Replay Mode integration ----------
+  // On load, if the app is globally in Replay Mode, jump straight to that
+  // timestamp instead of Live. Also listens for changes fired by
+  // SentinelReplay.enter()/resumeLive() from anywhere (common.js).
+  function syncWithGlobalReplayState() {
+    const state = window.SentinelReplay ? window.SentinelReplay.getState() : { mode: 'live' };
+    stopPlay();
+    if (state.mode === 'replay') {
+      mode = 'historical';
+      viewTickIndex = window.SENTINEL_DATA.getTickIndexForTimestamp(state.timestamp);
+    } else {
+      mode = 'live';
+      viewTickIndex = liveTickIndex;
+    }
+    renderAll();
+  }
+
+  document.addEventListener('sentinel:replay-changed', syncWithGlobalReplayState);
 
   // ---------- Detail panel ----------
   function selectZone(zoneId) {
@@ -488,6 +395,6 @@ function recenterMap() {
     initMap();
     wireControls();
     wireNotifPanel();
-    renderAll();
+    syncWithGlobalReplayState();
   });
 })();

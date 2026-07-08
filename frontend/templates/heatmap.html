@@ -66,9 +66,8 @@
 
     <!-- Mode bar -->
     <div class="mode-bar" id="modeBar">
-      <div class="mode-bar__status" id="modeLabel"></div>
-      <button class="mode-bar__return" id="returnLiveBtn">Return to Live</button>
-    </div>
+  <div class="mode-bar__status" id="modeLabel"></div>
+</div>
 
     <!-- Map -->
     <div class="card map-card">
@@ -78,12 +77,15 @@
 
     <!-- Scrubber (visible only in Historical mode, via CSS) -->
     <div class="card scrubber-card">
-      <div class="scrubber__row">
-        <button class="scrubber__play" id="playBtn">▶</button>
-        <input class="scrubber__track" id="scrubberTrack" type="range" min="0" max="6" step="1" value="6" />
-        <span class="scrubber__time mono" id="scrubberTime"></span>
-      </div>
-    </div>
+  <div class="scrubber__row">
+    <button class="scrubber__play" id="playBtn">▶</button>
+    <input class="scrubber__track" id="scrubberTrack" type="range" min="0" max="6" step="1" value="6" />
+    <span class="scrubber__time mono" id="scrubberTime"></span>
+  </div>
+  <div class="scrubber__return-row">
+    <button class="mode-bar__return" id="returnLiveBtn">Return to Live</button>
+  </div>
+</div>
 
     <!-- Detail panel -->
     <div class="card detail-panel">
@@ -114,6 +116,7 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="../static/js/data.js"></script>
   <script src="../static/js/common.js"></script>
   <script src="../static/js/heatmap.js"></script>
 </body>
