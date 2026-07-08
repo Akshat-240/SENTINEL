@@ -45,9 +45,26 @@ def generate_report():
             evidence = emerg.get("evidence")
             evacuation_route = emerg.get("evacuation_route")
 
-        report_text = generate_incident_report(
-            zone_id, risk_result, evidence, evacuation_route
+        from core.rag.formatter import RAGFormatter
+        from core.replay.replay_engine import get_replay_timeline
+        
+        formatter = RAGFormatter()
+        
+        risk_factors = {
+            "base_scores": risk_result.get("base_scores", {}),
+            "compound_bonus": risk_result.get("compound_bonus", {}),
+            "combinations_detected": risk_result.get("combinations_detected", [])
+        }
+        
+        timeline = get_replay_timeline(zone_id, limit=10)
+        
+        report_data = formatter.format_for_incident_report(
+            zone_snapshot=snapshot,
+            risk_factors=risk_factors,
+            compound_score=score,
+            timeline=timeline
         )
+        report_text = report_data.get("gemini_analysis", "Report generation failed.")
         
         return jsonify({
             "report": report_text,

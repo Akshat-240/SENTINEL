@@ -135,6 +135,7 @@ def background_task():
                 snapshot = get_zone_snapshot(zone_id)
                 log_snapshot(zone_id, snapshot, risk_result)
                 
+                final_score = risk_result.get("final_score", 0)
                 if final_score >= settings.ORCHESTRATOR_TRIGGER:
                     trigger_emergency_response(zone_id, risk_result)
         except Exception as e:
