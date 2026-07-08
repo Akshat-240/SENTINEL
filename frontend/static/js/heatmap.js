@@ -197,16 +197,6 @@
   // both the initial view and what "recenter" returns to.
   defaultBounds = L.latLngBounds(Object.values(ZONE_COORDS).map((c) => [c.lat, c.lng]));
 map.fitBounds(defaultBounds, { padding: [50, 50] });
-
-// Both pan and zoom can push zones out of view, so both should surface Recenter.
-map.on('moveend zoomend', updateRecenterVisibility);
-}
-
-  function updateRecenterVisibility() {
-  const btn = document.getElementById('recenterBtn');
-  if (!btn || !map || !defaultBounds) return;
-  const showsAllZones = map.getBounds().contains(defaultBounds);
-  btn.style.display = showsAllZones ? 'none' : 'flex';
 }
 
 function recenterMap() {

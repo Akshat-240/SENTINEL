@@ -67,6 +67,7 @@
   bottom: 14px;
   left: 14px;
   z-index: 400; /* above Leaflet's own panes/controls */
+  display: flex;
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
