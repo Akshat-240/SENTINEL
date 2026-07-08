@@ -19,6 +19,8 @@ window.SENTINEL_DATA = (function () {
     B: { lat: 17.6230, lng: 83.2020 },
     C: { lat: 17.6040, lng: 83.1860 },
     D: { lat: 17.6060, lng: 83.2040 },
+    E: { lat: 17.6180, lng: 83.1950 },
+    F: { lat: 17.6090, lng: 83.1920 },
   };
 
   const ZONE_AREA_NAME = {
@@ -26,6 +28,8 @@ window.SENTINEL_DATA = (function () {
     B: 'Coke Oven Battery',
     C: 'Blast Furnace Area',
     D: 'Steel Melt Shop',
+    E: 'Rolling Mill',
+    F: 'Raw Material Yard',
   };
 
   // ---------- Alert level vocabulary ----------
@@ -53,6 +57,8 @@ window.SENTINEL_DATA = (function () {
         B: { score: 12, level: 'normal', gas: 20, temp: 33, permits: 'None active', workers: [] },
         C: { score: 22, level: 'normal', gas: 130, temp: 39, permits: 'Electrical', workers: [] },
         D: { score: 15, level: 'normal', gas: 12, temp: 29, permits: 'None active', workers: [] },
+        E: { score: 10, level: 'normal', gas: 15, temp: 28, permits: 'None active', workers: [] },
+        F: { score: 8,  level: 'normal', gas: 10, temp: 27, permits: 'None active', workers: [] },
       },
     },
     {
@@ -62,6 +68,8 @@ window.SENTINEL_DATA = (function () {
         B: { score: 18, level: 'normal', gas: 45, temp: 36, permits: 'None active', workers: [] },
         C: { score: 24, level: 'normal', gas: 138, temp: 39, permits: 'Electrical', workers: [] },
         D: { score: 15, level: 'normal', gas: 12, temp: 29, permits: 'None active', workers: [] },
+        E: { score: 10, level: 'normal', gas: 15, temp: 28, permits: 'None active', workers: [] },
+        F: { score: 8,  level: 'normal', gas: 10, temp: 27, permits: 'None active', workers: [] },
       },
     },
     {
@@ -71,6 +79,8 @@ window.SENTINEL_DATA = (function () {
         B: { score: 35, level: 'caution', gas: 95, temp: 42, permits: 'Hot Work', workers: [] },
         C: { score: 27, level: 'normal', gas: 145, temp: 40, permits: 'Electrical', workers: [] },
         D: { score: 15, level: 'normal', gas: 12, temp: 29, permits: 'None active', workers: [] },
+        E: { score: 10, level: 'normal', gas: 15, temp: 28, permits: 'None active', workers: [] },
+        F: { score: 8,  level: 'normal', gas: 10, temp: 27, permits: 'None active', workers: [] },
       },
     },
     {
@@ -83,6 +93,8 @@ window.SENTINEL_DATA = (function () {
         },
         C: { score: 30, level: 'caution', gas: 165, temp: 41, permits: 'Electrical', workers: [] },
         D: { score: 15, level: 'normal', gas: 12, temp: 29, permits: 'None active', workers: [] },
+        E: { score: 10, level: 'normal', gas: 15, temp: 28, permits: 'None active', workers: [] },
+        F: { score: 8,  level: 'normal', gas: 10, temp: 27, permits: 'None active', workers: [] },
       },
     },
     {
@@ -98,6 +110,8 @@ window.SENTINEL_DATA = (function () {
         },
         C: { score: 33, level: 'caution', gas: 172, temp: 41, permits: 'Electrical', workers: [] },
         D: { score: 15, level: 'normal', gas: 12, temp: 29, permits: 'None active', workers: [] },
+        E: { score: 10, level: 'normal', gas: 15, temp: 28, permits: 'None active', workers: [] },
+        F: { score: 8,  level: 'normal', gas: 10, temp: 27, permits: 'None active', workers: [] },
       },
     },
     {
@@ -114,6 +128,8 @@ window.SENTINEL_DATA = (function () {
         },
         C: { score: 34, level: 'caution', gas: 174, temp: 41, permits: 'Electrical', workers: [] },
         D: { score: 15, level: 'normal', gas: 12, temp: 29, permits: 'None active', workers: [] },
+        E: { score: 10, level: 'normal', gas: 15, temp: 28, permits: 'None active', workers: [] },
+        F: { score: 8,  level: 'normal', gas: 10, temp: 27, permits: 'None active', workers: [] },
       },
     },
     {
@@ -130,6 +146,8 @@ window.SENTINEL_DATA = (function () {
         },
         C: { score: 36, level: 'caution', gas: 176, temp: 41, permits: 'Electrical', workers: [] },
         D: { score: 15, level: 'normal', gas: 12, temp: 29, permits: 'None active', workers: [] },
+        E: { score: 10, level: 'normal', gas: 15, temp: 28, permits: 'None active', workers: [] },
+        F: { score: 8,  level: 'normal', gas: 10, temp: 27, permits: 'None active', workers: [] },
       },
     },
   ];

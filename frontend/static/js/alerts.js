@@ -48,6 +48,24 @@
       ],
       workers: [],
     },
+    {
+      id: 'E', name: 'Zone E', score: 18, level: 'normal', levelLabel: 'Normal',
+      note: 'All parameters within safe limits.',
+      factors: [
+        { label: 'Gas', value: '11 PPM' }, { label: 'Temperature', value: '29°C' },
+        { label: 'Permits', value: 'None active' }, { label: 'Workers', value: '0' },
+      ],
+      workers: [],
+    },
+    {
+      id: 'F', name: 'Zone F', score: 14, level: 'normal', levelLabel: 'Normal',
+      note: 'All parameters within safe limits.',
+        factors: [
+          { label: 'Gas', value: '9 PPM' }, { label: 'Temperature', value: '27°C' },
+          { label: 'Permits', value: 'None active' }, { label: 'Workers', value: '0' },
+      ],
+      workers: [],
+    },
   ];
 
   const LEVEL_VAR = {
