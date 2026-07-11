@@ -33,6 +33,7 @@
     <a class="topbar__link is-active" href="permits.html">Permits</a>
     <a class="topbar__link" href="replay.html">Replay</a>
     <a class="topbar__link" href="report.html">Report</a>
+    <a class="topbar__link" href="copilot.html">AI Assistant</a>
   </nav>
 
   <div class="topbar__right">
@@ -65,19 +66,21 @@
 
 </div>
 
-<!-- Floating ai_assistant button — shared component, same on every page -->
-<div class="ai_assistant-fab" id="ai-assistant-fab">
-  <button class="ai_assistant-fab__button" id="ai-assistant-toggle">AI</button>
+<!-- ============ FLOATING ai_assistant ============ -->
+<div class="ai_assistant-fab">
   <div class="ai_assistant-fab__panel">
     <div class="ai_assistant-fab__header">
-      <span class="ai_assistant-fab__title">Copilot</span>
-      <a class="ai_assistant-fab__expand" href="copilot.html">Expand</a>
+      <span class="ai_assistant-fab__title">AI Assistant</span>
+      <a class="ai_assistant-fab__expand" href="copilot.html">Expand ↗</a>
     </div>
-    <div class="ai_assistant-fab__messages">Ask about any zone, permit, or alert.</div>
+    <div class="ai_assistant-fab__messages">
+      Ask about zone status, permits, or recommended actions.
+    </div>
     <div class="ai_assistant-fab__input-row">
-      <input class="ai_assistant-fab__input" type="text" placeholder="Ask Copilot...">
+      <input class="ai_assistant-fab__input" type="text" placeholder="Ask SENTINEL..." />
     </div>
   </div>
+  <button class="ai_assistant-fab__button">SC</button>
 </div>
 
 <script src="../static/js/data.js"></script>
