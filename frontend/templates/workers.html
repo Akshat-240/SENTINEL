@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="day">
+<head>
+  <meta charset="UTF-8" />
+  <script>
+  (function () {
+    try {
+      var theme = localStorage.getItem('sentinel_theme');
+      if (theme === 'day' || theme === 'night') {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+    } catch (e) { /* localStorage unavailable — falls back to default data-theme="day" already in the HTML */ }
+  })();
+</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SENTINEL — Workers</title>
+  <link rel="stylesheet" href="../static/css/sentinel.css" />
+  <link rel="stylesheet" href="../static/css/workers.css" />
+</head>
+<body>
+
+  <!-- ============ TOP BAR ============ -->
+  <header class="topbar">
+    <div class="topbar__logo">
+      <span class="topbar__logo-mark"></span>
+      SENTINEL
+    </div>
+
+    <nav class="topbar__nav">
+      <a class="topbar__link" href="index.html">Dashboard</a>
+      <a class="topbar__link" href="heatmap.html">Heatmap</a>
+      <a class="topbar__link is-active" href="workers.html">Workers</a>
+      <a class="topbar__link" href="permits.html">Permits</a>
+      <a class="topbar__link" href="replay.html">Replay</a>
+      <a class="topbar__link" href="report.html">Report</a>
+    </nav>
+
+    <div class="topbar__right">
+      <button class="theme-toggle">Night mode</button>
+      <span class="topbar__clock mono">00:00:00</span>
+    </div>
+  </header>
+
+  <!-- ============ MAIN LAYOUT ============ -->
+  <div class="workers-shell">
+
+    <div class="workers-header">
+      <h1>Workers</h1>
+      <div class="workers-summary" id="workersSummary">Loading…</div>
+    </div>
+
+    <div class="workers-controls card">
+      <div class="workers-zone-tabs" id="workersZoneTabs">
+        <button class="workers-zone-tab is-active" data-zone="all">All</button>
+        <button class="workers-zone-tab" data-zone="A">Zone A</button>
+        <button class="workers-zone-tab" data-zone="B">Zone B</button>
+        <button class="workers-zone-tab" data-zone="C">Zone C</button>
+        <button class="workers-zone-tab" data-zone="D">Zone D</button>
+        <button class="workers-zone-tab" data-zone="E">Zone E</button>
+        <button class="workers-zone-tab" data-zone="F">Zone F</button>
+      </div>
+      <input class="workers-search" id="workersSearch" type="text" placeholder="Search workers…" />
+    </div>
+
+    <div class="card workers-table-card">
+      <div class="workers-table-scroll">
+        <table class="workers-table">
+          <thead>
+            <tr>
+              <th data-sort="id">Worker</th>
+              <th data-sort="zone">Zone</th>
+              <th data-sort="urgency">Status</th>
+              <th data-sort="exposure">Exposure</th>
+              <th class="not-sortable">Permit</th>
+              <th data-sort="shift">Shift</th>
+            </tr>
+          </thead>
+          <tbody id="workersTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ FLOATING ai_assistant ============ -->
+  <div class="ai_assistant-fab">
+    <div class="ai_assistant-fab__panel">
+      <div class="ai_assistant-fab__header">
+        <span class="ai_assistant-fab__title">AI Assistant</span>
+        <a class="ai_assistant-fab__expand" href="ai_assistant.html">Expand ↗</a>
+      </div>
+      <div class="ai_assistant-fab__messages">
+        Ask about zone status, permits, or recommended actions.
+      </div>
+      <div class="ai_assistant-fab__input-row">
+        <input class="ai_assistant-fab__input" type="text" placeholder="Ask SENTINEL..." />
+      </div>
+    </div>
+    <button class="ai_assistant-fab__button">SC</button>
+  </div>
+
+  <script src="../static/js/data.js"></script>
+  <script src="../static/js/common.js"></script>
+  <script src="../static/js/workers.js"></script>
+</body>
+</html>
