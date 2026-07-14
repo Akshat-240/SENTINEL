@@ -1,35 +1,4 @@
-{
-  "zones": [
-    {
-      "zone_id": "zone_a",
-      "zone_name": "Furnace & Casting Bay",
-      "lat": 17.6868,
-      "lng": 83.2185,
-      "history_score": 3
-    },
-    {
-      "zone_id": "zone_b",
-      "zone_name": "Gas Storage / Confined Space",
-      "lat": 17.6872,
-      "lng": 83.2201,
-      "history_score": 8
-    },
-    {
-      "zone_id": "zone_c",
-      "zone_name": "Hot Work / Welding Bay",
-      "lat": 17.6879,
-      "lng": 83.2193,
-      "history_score": 6
-    },
-    {
-      "zone_id": "zone_d",
-      "zone_name": "Electrical Substation",
-      "lat": 17.6875,
-      "lng": 83.2178,
-      "history_score": 2
-    }
-  ]
-}
+
 [
   {
     "zone_id": "ZONE_A",
