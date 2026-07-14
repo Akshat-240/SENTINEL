@@ -3,122 +3,122 @@
     {
       "permit_id": "P001",
       "type": "Hot Work",
-      "zone_id": "zone_c",
-      "worker_assigned": "W06",
-      "status": "active",
-      "issued_at": "2026-07-04 09:07:00"
+      "zone_id": "ZONE_A",
+      "worker_assigned": "W02",
+      "status": "inactive",
+      "issued_at": "2026-07-08 09:07:00"
     },
     {
       "permit_id": "P002",
       "type": "Confined Space",
-      "zone_id": "zone_b",
-      "worker_assigned": "W07",
+      "zone_id": "ZONE_A",
+      "worker_assigned": "W06",
       "status": "active",
-      "issued_at": "2026-07-04 09:14:00"
+      "issued_at": "2026-07-08 09:14:00"
     },
     {
       "permit_id": "P003",
       "type": "Electrical",
-      "zone_id": "zone_d",
-      "worker_assigned": "W07",
-      "status": "active",
-      "issued_at": "2026-07-04 09:21:00"
+      "zone_id": "ZONE_D",
+      "worker_assigned": "W05",
+      "status": "inactive",
+      "issued_at": "2026-07-08 09:21:00"
     },
     {
       "permit_id": "P004",
       "type": "General",
-      "zone_id": "zone_a",
-      "worker_assigned": "W08",
+      "zone_id": "ZONE_E",
+      "worker_assigned": "W02",
       "status": "active",
-      "issued_at": "2026-07-04 09:28:00"
+      "issued_at": "2026-07-08 09:28:00"
     },
     {
       "permit_id": "P005",
       "type": "Hot Work",
-      "zone_id": "zone_b",
-      "worker_assigned": "W06",
+      "zone_id": "ZONE_C",
+      "worker_assigned": "W08",
       "status": "inactive",
-      "issued_at": "2026-07-04 09:35:00"
+      "issued_at": "2026-07-08 09:35:00"
     },
     {
       "permit_id": "P006",
       "type": "Confined Space",
-      "zone_id": "zone_c",
-      "worker_assigned": "W10",
+      "zone_id": "ZONE_B",
+      "worker_assigned": "W03",
       "status": "inactive",
-      "issued_at": "2026-07-04 09:42:00"
+      "issued_at": "2026-07-08 09:42:00"
     },
     {
       "permit_id": "P007",
       "type": "Electrical",
-      "zone_id": "zone_b",
-      "worker_assigned": "W07",
+      "zone_id": "ZONE_F",
+      "worker_assigned": "W04",
       "status": "active",
-      "issued_at": "2026-07-04 09:49:00"
+      "issued_at": "2026-07-08 09:49:00"
     },
     {
       "permit_id": "P008",
       "type": "Hot Work",
-      "zone_id": "zone_a",
-      "worker_assigned": "W02",
+      "zone_id": "ZONE_B",
+      "worker_assigned": "W01",
       "status": "inactive",
-      "issued_at": "2026-07-04 09:56:00"
+      "issued_at": "2026-07-08 09:56:00"
     },
     {
       "permit_id": "P009",
       "type": "General",
-      "zone_id": "zone_d",
-      "worker_assigned": "W01",
+      "zone_id": "ZONE_D",
+      "worker_assigned": "W04",
       "status": "active",
-      "issued_at": "2026-07-04 10:03:00"
+      "issued_at": "2026-07-08 10:03:00"
     },
     {
       "permit_id": "P010",
       "type": "Confined Space",
-      "zone_id": "zone_d",
+      "zone_id": "ZONE_E",
       "worker_assigned": "W03",
-      "status": "inactive",
-      "issued_at": "2026-07-04 10:10:00"
+      "status": "active",
+      "issued_at": "2026-07-08 10:10:00"
     },
     {
       "permit_id": "P011",
       "type": "Electrical",
-      "zone_id": "zone_a",
-      "worker_assigned": "W06",
+      "zone_id": "ZONE_A",
+      "worker_assigned": "W02",
       "status": "active",
-      "issued_at": "2026-07-04 10:17:00"
+      "issued_at": "2026-07-08 10:17:00"
     },
     {
       "permit_id": "P012",
       "type": "Hot Work",
-      "zone_id": "zone_d",
-      "worker_assigned": "W07",
-      "status": "active",
-      "issued_at": "2026-07-04 10:24:00"
+      "zone_id": "ZONE_F",
+      "worker_assigned": "W03",
+      "status": "inactive",
+      "issued_at": "2026-07-08 10:24:00"
     },
     {
       "permit_id": "P013",
       "type": "General",
-      "zone_id": "zone_c",
-      "worker_assigned": "W04",
+      "zone_id": "ZONE_C",
+      "worker_assigned": "W02",
       "status": "inactive",
-      "issued_at": "2026-07-04 10:31:00"
+      "issued_at": "2026-07-08 10:31:00"
     },
     {
       "permit_id": "P014",
       "type": "Confined Space",
-      "zone_id": "zone_a",
-      "worker_assigned": "W10",
-      "status": "inactive",
-      "issued_at": "2026-07-04 10:38:00"
+      "zone_id": "ZONE_D",
+      "worker_assigned": "W01",
+      "status": "active",
+      "issued_at": "2026-07-08 10:38:00"
     },
     {
       "permit_id": "P015",
       "type": "Electrical",
-      "zone_id": "zone_c",
-      "worker_assigned": "W09",
+      "zone_id": "ZONE_C",
+      "worker_assigned": "W08",
       "status": "active",
-      "issued_at": "2026-07-04 10:45:00"
+      "issued_at": "2026-07-08 10:45:00"
     }
   ]
 }

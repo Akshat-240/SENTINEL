@@ -1,0 +1,66 @@
+{
+  "scenario_name": "ZONE_A Gas Leak - Full Demo Sequence",
+  "description": "The exact sequence the live demo replays. Matches critical_scenario.csv timing for ZONE_A. Total runtime: ~11 minutes at 30-second ticks.",
+  "timeline": [
+    {
+      "time": "09:00:00",
+      "event": "sensor_reading",
+      "zone_id": "ZONE_A",
+      "gas_ppm": 20,
+      "risk_level": "NORMAL",
+      "risk_score": 12,
+      "narration": "Baseline readings. Everything normal in ZONE_A."
+    },
+    {
+      "time": "09:02:30",
+      "event": "sensor_reading",
+      "zone_id": "ZONE_A",
+      "gas_ppm": 45,
+      "risk_level": "NORMAL",
+      "risk_score": 18,
+      "narration": "Slight upward drift, still within safe range."
+    },
+    {
+      "time": "09:03:30",
+      "event": "permit_issued",
+      "zone_id": "ZONE_A",
+      "permit_type": "Hot Work",
+      "risk_level": "CAUTION",
+      "risk_score": 35,
+      "narration": "Hot Work permit approved in ZONE_A - a Confined Space permit is already active here. Compound risk engine flags the overlap."
+    },
+    {
+      "time": "09:04:30",
+      "event": "worker_entry",
+      "zone_id": "ZONE_A",
+      "worker_id": "W04",
+      "risk_level": "WARNING",
+      "risk_score": 61,
+      "narration": "Worker enters ZONE_A while gas trend continues rising and two hazardous permits are active simultaneously."
+    },
+    {
+      "time": "09:05:00",
+      "event": "sensor_reading",
+      "zone_id": "ZONE_A",
+      "gas_ppm": 847,
+      "risk_level": "CRITICAL",
+      "risk_score": 88,
+      "narration": "Gas concentration spikes sharply. Similarity Engine matches this pattern to the Visakhapatnam 2025 incident profile."
+    },
+    {
+      "time": "09:05:30",
+      "event": "alert_triggered",
+      "zone_id": "ZONE_A",
+      "risk_level": "SHUTDOWN",
+      "risk_score": 96,
+      "narration": "Emergency Orchestrator triggers automatic shutdown protocol and evacuation alert for ZONE_A."
+    }
+  ],
+  "matched_disaster_profile": "visakhapatnam_2025",
+  "key_talking_points": [
+    "Compound risk detection: two overlapping hazardous permits flagged automatically",
+    "Historical similarity: matched to a real past incident in seconds",
+    "Time from first warning sign to shutdown: under 6 minutes",
+    "Every step logged for the incident replay and report generator"
+  ]
+}
