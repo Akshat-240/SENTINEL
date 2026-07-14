@@ -17,18 +17,18 @@
   --n-700: #343A40;
   --n-800: #212529;
 
-  --risk-normal:        #415D43;
+  --risk-normal:        #34a93c;
   --risk-normal-tint:   #CDE0D0;
-  --risk-caution:       #8A7530;
-  --risk-caution-tint:  #EDE3C3;
-  --risk-warning:       #965A34;
+  --risk-caution:       #f4d265;
+  --risk-caution-tint:  #fbf2d3;
+  --risk-warning:       #f57220;
   --risk-warning-tint:  #EAD0BC;
-  --risk-high:          #AD2831;
+  --risk-high:          #e90010;
   --risk-high-tint:     #E8C4C8;
-  --risk-critical:      #640D14;
+  --risk-critical:      #5b020a;
   --risk-critical-tint: #C99BA0;
-  --risk-shutdown:      #17191B;
-  --risk-shutdown-tint: #D8D8D8;
+  --risk-shutdown:      #5d5a5a;
+  --risk-shutdown-tint: #d4d0d0;
 
   --font-display: 'Space Grotesk', sans-serif;
   --font-body: 'IBM Plex Sans', sans-serif;
@@ -44,7 +44,7 @@
 }
 
 :root, [data-theme="day"] {
-  --bg: #F2F4EF;
+  --bg: hsl(84, 19%, 95%);
   --bg-elevated: #FFFFFF;
   --bg-sunken: #E9ECE5;
   --text: var(--n-800);
@@ -181,8 +181,9 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
 }
 
 /* ---------- Alert Panel ---------- */
-.alert-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-@media (max-width: 720px) { .alert-grid { grid-template-columns: repeat(2, 1fr); } }
+.alert-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 960px) { .alert-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .alert-grid { grid-template-columns: 1fr; } }
 
 .zone-card {
   background: var(--bg-elevated);
@@ -255,8 +256,19 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
 .trend-panel__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .trend-panel__title { font-size: 14px; font-weight: 600; }
 .trend-panel__zones { display: flex; gap: 4px; background: var(--bg-sunken); padding: 3px; border-radius: var(--radius-pill); }
-.trend-panel__zone-btn { font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: var(--radius-pill); color: var(--text-muted); transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease); }
-.trend-panel__zone-btn.is-active { background: var(--bg-elevated); color: var(--text); box-shadow: var(--shadow-card); }
+.temp-panel__zone-btn {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.temp-panel__zone-btn.is-active {
+  background: var(--bg-elevated);
+  color: var(--text);
+  box-shadow: var(--shadow-card);
+}
 
 .trend-panel__chart { position: relative; height: 170px; margin-bottom: 6px; }
 .trend-panel__tooltip {

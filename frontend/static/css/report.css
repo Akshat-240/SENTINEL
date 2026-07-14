@@ -1,0 +1,261 @@
+/* ==========================================================================
+   SENTINEL — report.css
+   Page-specific additions for report.html. Single-column, document-style
+   layout (not card-grid) — reads like a formal/printable incident report.
+   Color is the most restrained of any page: only the alert-level badge
+   (Section 1) and small inline accents on flagged violations (Section 5)
+   use risk color. Everything else stays neutral for report credibility.
+   Reuses tokens from sentinel.css (colors, radii, shadows, .card, .pill).
+   ========================================================================== */
+
+.report-shell {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 28px 22px 120px;
+}
+
+/* ---------- Header ----------
+   Plain document-style heading — no card, no background, no border,
+   no shadow, no fixed/sticky positioning. Scrolls away naturally with
+   the rest of the page, like the title of a printed report. */
+.report-header {
+  margin-bottom: 28px;
+}
+
+.report-header__inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.report-header__title { font-size: 22px; margin-bottom: 6px; }
+
+.report-header__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.report-header__meta strong { color: var(--text-secondary); font-weight: 600; }
+
+.report-download-btn {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--n-50);
+  background: var(--n-800);
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--dur-fast) var(--ease);
+}
+[data-theme="night"] .report-download-btn { background: var(--n-50); color: var(--n-800); }
+.report-download-btn:hover { transform: translateY(-1px); }
+
+/* ---------- Section shell ---------- */
+.report-section {
+  margin-top: 34px;
+}
+.report-section__title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+/* ---------- Section 1: Summary Strip ---------- */
+.report-summary-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+@media (max-width: 560px) { .report-summary-strip { grid-template-columns: 1fr; } }
+
+.report-summary-stat {
+  padding: 16px 18px;
+}
+.report-summary-stat__label { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+.report-summary-stat__value { font-family: var(--font-mono); font-size: 22px; font-weight: 500; color: var(--text); }
+
+/* This is the one place besides Section 5 where risk color is allowed to
+   appear — the alert level reached, shown as a pill. */
+.report-summary-stat__pill-row { margin-top: 2px; }
+
+/* ---------- Section 6: Recommended Actions ---------- */
+.report-actions {
+  list-style: none;
+  counter-reset: report-actions;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.report-actions li {
+  counter-increment: report-actions;
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+.report-actions li::before {
+  content: counter(report-actions);
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg-sunken);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------- Section 2: Event Timeline (condensed, static — no click/expand) ---------- */
+.report-timeline {
+  position: relative;
+  padding-left: 22px;
+}
+.report-timeline::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--border-strong);
+}
+.report-timeline-entry {
+  position: relative;
+  padding-bottom: 14px;
+}
+.report-timeline-entry:last-child { padding-bottom: 0; }
+.report-timeline-entry__dot {
+  position: absolute;
+  left: -22px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--entry-color, var(--risk-normal));
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 0 1.5px var(--entry-color, var(--risk-normal));
+}
+.report-timeline-entry__row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+.report-timeline-entry__time { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+.report-timeline-entry__text { color: var(--text-secondary); }
+.report-timeline-entry__score { font-family: var(--font-mono); font-size: 12px; color: var(--entry-color, var(--text)); margin-left: auto; }
+
+/* ---------- Section 3: Compound Factors Detected ---------- */
+.report-factor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.report-factor-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.report-factor-row:last-child { border-bottom: none; }
+.report-factor-row__points { font-family: var(--font-mono); color: var(--text); flex-shrink: 0; }
+
+/* ---------- Section 5: Regulatory Violations Flagged ---------- */
+.report-violation {
+  border-left: 3px solid var(--violation-color, var(--risk-warning));
+  padding: 4px 0 4px 14px;
+  margin-bottom: 16px;
+}
+.report-violation:last-child { margin-bottom: 0; }
+.report-violation__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.report-violation__title { font-size: 13px; font-weight: 600; color: var(--text); }
+.report-violation__meta { font-size: 12px; font-family: var(--font-mono); color: var(--text-muted); }
+/* Body text stays neutral even on a flagged violation — only the left
+   border and the rule reference carry color. */
+.report-violation__text { font-size: 13px; line-height: 1.55; color: var(--text-secondary); max-width: 68ch; }
+.report-violation__rule { font-family: var(--font-mono); font-size: 11px; color: var(--violation-color, var(--risk-warning)); margin-top: 6px; }
+
+/* ---------- Section 7: Timestamped Evidence Log ---------- */
+.report-evidence-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.report-evidence-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-strong);
+}
+.report-evidence-table td {
+  padding: 10px 12px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+}
+.report-evidence-table tr:last-child td { border-bottom: none; }
+.report-evidence-table td:first-child, .report-evidence-table th:first-child { font-family: var(--font-mono); }
+
+/* ---------- Section 4: Historical Similarity (closing section) ---------- */
+.report-similarity {
+  text-align: center;
+  padding: 46px 20px 10px;
+  border-top: 1px solid var(--border);
+}
+.report-similarity__value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 56px;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 14px;
+}
+.report-similarity__label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  max-width: 46ch;
+  margin: 0 auto 10px;
+  line-height: 1.5;
+}
+.report-similarity__window {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ---------- Print (Download PDF) ---------- */
+@media print {
+  .topbar, .ai_assistant-fab, .report-download-btn { display: none !important; }
+  html, body { background: #ffffff !important; }
+  .report-shell { max-width: 100%; padding: 0 12px; }
+  .report-header { position: static; box-shadow: none; }
+  .card { box-shadow: none; border: 1px solid #e4e7e0; }
+  .report-section { break-inside: avoid; }
+}

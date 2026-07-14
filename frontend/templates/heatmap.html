@@ -2,6 +2,16 @@
 <html lang="en" data-theme="day">
 <head>
   <meta charset="UTF-8" />
+  <script>
+  (function () {
+    try {
+      var theme = localStorage.getItem('sentinel_theme');
+      if (theme === 'day' || theme === 'night') {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+    } catch (e) { /* localStorage unavailable — falls back to default data-theme="day" already in the HTML */ }
+  })();
+</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SENTINEL — Heatmap</title>
   <link rel="stylesheet" href="../static/css/sentinel.css" />
@@ -24,6 +34,7 @@
       <a class="topbar__link" href="permits.html">Permits</a>
       <a class="topbar__link" href="replay.html">Replay</a>
       <a class="topbar__link" href="report.html">Report</a>
+      <a class="topbar__link" href="copilot.html">AI Assistant</a>
     </nav>
 
     <div class="topbar__right">
@@ -56,23 +67,26 @@
 
     <!-- Mode bar -->
     <div class="mode-bar" id="modeBar">
-      <div class="mode-bar__status" id="modeLabel"></div>
-      <button class="mode-bar__return" id="returnLiveBtn">Return to Live</button>
-    </div>
+  <div class="mode-bar__status" id="modeLabel"></div>
+</div>
 
     <!-- Map -->
     <div class="card map-card">
       <div class="map-card__surface" id="mapSurface"></div>
+      <button class="map-recenter-btn" id="recenterBtn" type="button">⤾ Recenter</button>
     </div>
 
     <!-- Scrubber (visible only in Historical mode, via CSS) -->
     <div class="card scrubber-card">
-      <div class="scrubber__row">
-        <button class="scrubber__play" id="playBtn">▶</button>
-        <input class="scrubber__track" id="scrubberTrack" type="range" min="0" max="6" step="1" value="6" />
-        <span class="scrubber__time mono" id="scrubberTime"></span>
-      </div>
-    </div>
+  <div class="scrubber__row">
+    <button class="scrubber__play" id="playBtn">▶</button>
+    <input class="scrubber__track" id="scrubberTrack" type="range" min="0" max="6" step="1" value="6" />
+    <span class="scrubber__time mono" id="scrubberTime"></span>
+  </div>
+  <div class="scrubber__return-row">
+    <button class="mode-bar__return" id="returnLiveBtn">Return to Live</button>
+  </div>
+</div>
 
     <!-- Detail panel -->
     <div class="card detail-panel">
@@ -90,7 +104,7 @@
     <div class="ai_assistant-fab__panel">
       <div class="ai_assistant-fab__header">
         <span class="ai_assistant-fab__title">AI Assistant</span>
-        <a class="ai_assistant-fab__expand" href="ai_assistant.html">Expand ↗</a>
+        <a class="ai_assistant-fab__expand" href="copilot.html">Expand ↗</a>
       </div>
       <div class="ai_assistant-fab__messages">
         Ask about zone status, permits, or recommended actions.
@@ -103,6 +117,7 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="../static/js/data.js"></script>
   <script src="../static/js/common.js"></script>
   <script src="../static/js/heatmap.js"></script>
 </body>

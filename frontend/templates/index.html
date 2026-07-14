@@ -2,6 +2,16 @@
 <html lang="en" data-theme="day">
 <head>
   <meta charset="UTF-8" />
+  <script>
+  (function () {
+    try {
+      var theme = localStorage.getItem('sentinel_theme');
+      if (theme === 'day' || theme === 'night') {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+    } catch (e) { /* localStorage unavailable — falls back to default data-theme="day" already in the HTML */ }
+  })();
+</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SENTINEL — Dashboard</title>
   <link rel="stylesheet" href="../static/css/sentinel.css" />
@@ -22,6 +32,7 @@
       <a class="topbar__link" href="permits.html">Permits</a>
       <a class="topbar__link" href="replay.html">Replay</a>
       <a class="topbar__link" href="report.html">Report</a>
+      <a class="topbar__link" href="copilot.html">AI Assistant</a>
     </nav>
 
     <div class="topbar__right">
@@ -48,7 +59,7 @@
       </div>
     </aside>
 
-    <!-- MIDDLE COLUMN — Alert Panel / Heatmap Teaser / Trend Graph -->
+    <!-- MIDDLE COLUMN — Alert Panel / Temperature Trend / Gas Trend -->
     <main class="main-column">
 
       <section>
@@ -56,22 +67,35 @@
         <div class="alert-grid" id="alertGrid"></div>
       </section>
 
-      <section class="card">
-        <div class="heatmap-teaser__header">
-          <span class="heatmap-teaser__title">Plant Heatmap</span>
-          <a class="heatmap-teaser__link" href="heatmap.html">View full map</a>
+      <section class="card trend-panel">
+        <div class="trend-panel__header">
+          <span class="trend-panel__title">Temperature Trend</span>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+            <div class="trend-panel__zones" id="tempZoneButtons">
+              <button class="temp-panel__zone-btn is-active" data-zone="A">A</button>
+              <button class="temp-panel__zone-btn" data-zone="B">B</button>
+              <button class="temp-panel__zone-btn" data-zone="C">C</button>
+              <button class="temp-panel__zone-btn" data-zone="D">D</button>
+              <button class="temp-panel__zone-btn" data-zone="E">E</button>
+              <button class="temp-panel__zone-btn" data-zone="F">F</button>
+            </div>
+            <a class="heatmap-teaser__link" href="heatmap.html" style="padding:6px 12px; font-size:11px;">View Heatmap</a>
+          </div>
         </div>
-        <div class="floorplan" id="heatmapTeaserPreview"></div>
+        <div class="trend-panel__chart" id="tempTrendChart"></div>
+        <div class="temp-panel__keypoints" id="tempTrendKeypoints"></div>
       </section>
 
       <section class="card trend-panel">
         <div class="trend-panel__header">
           <span class="trend-panel__title">Gas Trend</span>
-          <div class="trend-panel__zones">
-            <button class="trend-panel__zone-btn" data-zone="A">A</button>
-            <button class="trend-panel__zone-btn is-active" data-zone="B">B</button>
-            <button class="trend-panel__zone-btn" data-zone="C">C</button>
-            <button class="trend-panel__zone-btn" data-zone="D">D</button>
+          <div class="trend-panel__zones" id="gasZoneButtons">
+            <button class="temp-panel__zone-btn" data-zone="A">A</button>
+            <button class="temp-panel__zone-btn is-active" data-zone="B">B</button>
+            <button class="temp-panel__zone-btn" data-zone="C">C</button>
+            <button class="temp-panel__zone-btn" data-zone="D">D</button>
+            <button class="temp-panel__zone-btn" data-zone="E">E</button>
+            <button class="temp-panel__zone-btn" data-zone="F">F</button>
           </div>
         </div>
         <div class="trend-panel__chart" id="trendChart"></div>
@@ -86,7 +110,7 @@
     <div class="ai_assistant-fab__panel">
       <div class="ai_assistant-fab__header">
         <span class="ai_assistant-fab__title">AI Assistant</span>
-        <a class="ai_assistant-fab__expand" href="ai_assistant.html">Expand ↗</a>
+        <a class="ai_assistant-fab__expand" href="copilot.html">Expand ↗</a>
       </div>
       <div class="ai_assistant-fab__messages">
         Ask about zone status, permits, or recommended actions.
@@ -98,8 +122,10 @@
     <button class="ai_assistant-fab__button">SC</button>
   </div>
 
+  <script src="../static/js/data.js"></script>
   <script src="../static/js/common.js"></script>
   <script src="../static/js/alerts.js"></script>
+  <script src="../static/js/temps.js"></script>
   <script src="../static/js/trends.js"></script>
   <script src="../static/js/workers.js"></script>
 </body>

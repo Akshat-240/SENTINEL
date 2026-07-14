@@ -1,0 +1,227 @@
+/* ==========================================================================
+   SENTINEL — replay.css
+   Page-specific additions for replay.html. Reuses all tokens/components
+   from sentinel.css (colors, radii, shadows, .card, .pill).
+   ========================================================================== */
+
+.replay-shell {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 28px 22px 100px;
+}
+
+/* ---------- Header ---------- */
+.replay-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.replay-header h1 { font-size: 24px; }
+.replay-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 2px;
+}
+
+.replay-play-btn {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--n-50);
+  background: var(--n-800);
+  padding: 9px 16px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+[data-theme="night"] .replay-play-btn { background: var(--n-50); color: var(--n-800); }
+.replay-play-btn:hover { transform: translateY(-1px); }
+.replay-play-btn.is-playing { background: var(--risk-high); color: #fff; }
+
+/* ---------- Controls row (zone tabs + search) ---------- */
+.replay-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 12px 14px;
+}
+
+.replay-zone-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-sunken);
+  padding: 3px;
+  border-radius: var(--radius-pill);
+}
+.replay-zone-tab {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.replay-zone-tab.is-active {
+  background: var(--bg-elevated);
+  color: var(--text);
+  box-shadow: var(--shadow-card);
+}
+
+.replay-search {
+  flex: 1;
+  min-width: 180px;
+  max-width: 280px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  padding: 9px 16px;
+  font-size: 12px;
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ---------- Timeline ---------- */
+.replay-timeline {
+  position: relative;
+  padding-left: 26px;
+}
+
+/* the continuous connecting line down the left side */
+.replay-timeline::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: var(--border-strong);
+}
+
+.replay-entry {
+  position: relative;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+.replay-entry:last-child { margin-bottom: 0; }
+
+.replay-entry__dot {
+  position: absolute;
+  left: -26px;
+  top: 18px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--entry-color, var(--risk-normal));
+  border: 3px solid var(--bg);
+  box-shadow: 0 0 0 2px var(--entry-color, var(--risk-normal));
+  transition: transform var(--dur-fast) var(--ease);
+}
+.replay-entry.is-current .replay-entry__dot {
+  transform: scale(1.3);
+}
+
+.replay-entry__card {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+  padding: 14px 16px;
+  border-left: 4px solid var(--entry-color, var(--risk-normal));
+  transition: box-shadow var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.replay-entry:hover .replay-entry__card { box-shadow: var(--shadow-elevated); transform: translateY(-1px); }
+.replay-entry.is-current .replay-entry__card { box-shadow: var(--shadow-elevated); }
+
+.replay-entry__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.replay-entry__time {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.replay-entry__zone-tag {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-left: 8px;
+}
+
+.replay-entry__score {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--entry-color, var(--text));
+}
+
+.replay-entry__text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-top: 4px;
+}
+
+/* Expanded detail (click-to-expand, same philosophy as Alert Panel) */
+.replay-entry__detail {
+  display: none;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.replay-entry.is-open .replay-entry__detail { display: block; }
+
+.replay-entry__zone-block { margin-bottom: 14px; }
+.replay-entry__zone-block:last-child { margin-bottom: 0; }
+.replay-entry__zone-block-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.replay-entry__view-heatmap {
+  display: inline-flex;
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg-sunken);
+  padding: 7px 14px;
+  border-radius: var(--radius-pill);
+  transition: background var(--dur-fast) var(--ease);
+}
+.replay-entry__view-heatmap:hover { background: var(--border-strong); }
+
+/* Cluster grouping (multiple zones, same timestamp) */
+.replay-cluster-heading {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 0 0 6px 2px;
+}
+
+.replay-empty {
+  text-align: center;
+  padding: 40px 16px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+@media (max-width: 720px) {
+  .replay-controls { flex-direction: column; align-items: stretch; }
+  .replay-search { max-width: 100%; }
+}
