@@ -62,13 +62,10 @@ def generate_report():
             compound_score=score,
             timeline=timeline
         )
-        report_text = report_data.get("gemini_analysis", "Report generation failed.")
-        
-        return jsonify({
-            "report": report_text,
-            "zone_id": zone_id,
-            "score": score
-        })
+        # Return the entire report data structure so the frontend can render all sections
+        report_data["zone_id"] = zone_id
+        report_data["score"] = score
+        return jsonify(report_data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

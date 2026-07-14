@@ -51,7 +51,8 @@ def calculate_risk(zone_snapshot):
         "base_scores": base_scores,
         "compound_bonus": compound_bonus,
         "alert_level": alert_level,
-        "combinations_detected": compound_bonus.get("combinations_detected", [])
+        "combinations_detected": compound_bonus.get("combinations_detected", []),
+        "snapshot": zone_snapshot
     }
 
 def calculate_all_zones():

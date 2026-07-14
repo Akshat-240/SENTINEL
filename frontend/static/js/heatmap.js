@@ -9,7 +9,7 @@
 (function () {
   'use strict';
 
-  const { TICKS, ZONE_COORDS, ZONE_AREA_NAME, LEVEL_ORDER, LEVEL_LABEL, LEVEL_VAR, LEVEL_TINT_VAR } = window.SENTINEL_DATA;
+  const { ZONE_COORDS, ZONE_AREA_NAME, LEVEL_ORDER, LEVEL_LABEL, LEVEL_VAR, LEVEL_TINT_VAR } = window.SENTINEL_DATA;
 
   const SENSOR_OFFSET = { lat: 0.0015, lng: 0.0018 };
 
@@ -21,28 +21,65 @@
     ];
   }
 
-  const tickCount = TICKS.length;
+  function getTickCount() { return window.SENTINEL_DATA.tickCount; }
 
-  function buildZoneData(tickIndex) {
-    const tick = TICKS[tickIndex];
+  function createDummyZoneData() {
     const out = {};
-    Object.keys(tick.zones).forEach((zid) => {
-      const z = tick.zones[zid];
+    Object.keys(ZONE_COORDS).forEach(zid => {
       out[zid] = {
-        id: zid,
-        name: `Zone ${zid}`,
-        area: ZONE_AREA_NAME[zid],
-        score: z.score,
-        level: z.level,
-        levelLabel: LEVEL_LABEL[z.level],
-        coords: ZONE_COORDS[zid],
-        sensorCoords: { lat: ZONE_COORDS[zid].lat + SENSOR_OFFSET.lat, lng: ZONE_COORDS[zid].lng + SENSOR_OFFSET.lng },
-        note: z.level === 'normal' ? 'All parameters within safe limits.' : `${LEVEL_LABEL[z.level]} conditions — monitor zone.`,
-        factors: factorsFor(z.gas, z.temp, z.permits),
-        workers: z.workers,
-      };
+        id: zid, name: `Zone ${zid}`, area: ZONE_AREA_NAME[zid],
+        score: 0, level: 'normal', levelLabel: 'Normal',
+        coords: ZONE_COORDS[zid], sensorCoords: { lat: ZONE_COORDS[zid].lat + SENSOR_OFFSET.lat, lng: ZONE_COORDS[zid].lng + SENSOR_OFFSET.lng },
+        note: '', factors: [], workers: []
+      }
     });
     return out;
+  }
+
+  function buildZoneData(tickIndex) {
+    if (mode === 'live') {
+      const liveData = window.SENTINEL_DATA.getLiveState();
+      const out = {};
+      Object.keys(liveData).forEach((zid) => {
+        const z = liveData[zid];
+        out[zid] = {
+          id: zid,
+          name: `Zone ${zid}`,
+          area: ZONE_AREA_NAME[zid],
+          score: z.score,
+          level: z.level,
+          levelLabel: z.levelLabel || LEVEL_LABEL[z.level],
+          coords: ZONE_COORDS[zid],
+          sensorCoords: { lat: ZONE_COORDS[zid].lat + SENSOR_OFFSET.lat, lng: ZONE_COORDS[zid].lng + SENSOR_OFFSET.lng },
+          note: z.note || (z.level === 'normal' ? 'All parameters within safe limits.' : `${LEVEL_LABEL[z.level]} conditions — monitor zone.`),
+          factors: factorsFor(z.gas, z.temp, z.permits),
+          workers: z.workers || [],
+        };
+      });
+      if (Object.keys(out).length === 0) return createDummyZoneData();
+      return out;
+    } else {
+      const tick = window.SENTINEL_DATA.getTickByIndex(tickIndex);
+      if (!tick || !tick.zones) return createDummyZoneData();
+      const out = {};
+      Object.keys(tick.zones).forEach((zid) => {
+        const z = tick.zones[zid];
+        out[zid] = {
+          id: zid,
+          name: `Zone ${zid}`,
+          area: ZONE_AREA_NAME[zid],
+          score: z.score,
+          level: z.level,
+          levelLabel: LEVEL_LABEL[z.level],
+          coords: ZONE_COORDS[zid],
+          sensorCoords: { lat: ZONE_COORDS[zid].lat + SENSOR_OFFSET.lat, lng: ZONE_COORDS[zid].lng + SENSOR_OFFSET.lng },
+          note: z.level === 'normal' ? 'All parameters within safe limits.' : `${LEVEL_LABEL[z.level]} conditions — monitor zone.`,
+          factors: factorsFor(z.gas, z.temp, z.permits),
+          workers: z.workers || [],
+        };
+      });
+      return out;
+    }
   }
 
   function highestRiskZoneId(zoneData) {
@@ -60,8 +97,7 @@
 
   // ---------- State ----------
   let mode = 'live';
-  let liveTickIndex = tickCount - 1;
-  let viewTickIndex = tickCount - 1;
+  let viewTickIndex = 0;
   let pinnedZoneId = null;
   let isPlaying = false;
   let playTimer = null;
@@ -153,7 +189,7 @@
   function renderModeBar() {
     const bar = document.getElementById('modeBar');
     const label = document.getElementById('modeLabel');
-    const tick = TICKS[viewTickIndex];
+    const tick = window.SENTINEL_DATA.getTickByIndex(viewTickIndex) || {time: '00:00'};
 
     if (mode === 'live') {
       bar.classList.remove('is-historical');
@@ -167,16 +203,17 @@
   function returnToLive() {
     stopPlay();
     mode = 'live';
-    viewTickIndex = liveTickIndex;
+    viewTickIndex = Math.max(0, getTickCount() - 1);
     renderAll();
   }
 
   // ---------- Scrubber ----------
   function renderScrubber() {
     const track = document.getElementById('scrubberTrack');
-    track.max = tickCount - 1;
+    track.max = Math.max(0, getTickCount() - 1);
     track.value = viewTickIndex;
-    document.getElementById('scrubberTime').textContent = TICKS[viewTickIndex].time;
+    const tick = window.SENTINEL_DATA.getTickByIndex(viewTickIndex);
+    document.getElementById('scrubberTime').textContent = tick ? tick.time : '00:00';
     document.getElementById('playBtn').textContent = isPlaying ? '❚❚' : '▶';
   }
 
@@ -192,7 +229,7 @@
     mode = 'historical';
     isPlaying = true;
 
-    if (viewTickIndex >= tickCount - 1) {
+    if (viewTickIndex >= getTickCount() - 1) {
       viewTickIndex = 0;
       notifications.length = 0;
       lastNotifiedLevelByZone = {};
@@ -201,8 +238,8 @@
     renderAll();
     playTimer = setInterval(() => {
       viewTickIndex += 1;
-      if (viewTickIndex >= tickCount - 1) {
-        viewTickIndex = tickCount - 1;
+      if (viewTickIndex >= getTickCount() - 1) {
+        viewTickIndex = getTickCount() - 1;
         renderAll();
         stopPlay();
         return;
@@ -229,7 +266,7 @@
       viewTickIndex = window.SENTINEL_DATA.getTickIndexForTimestamp(state.timestamp);
     } else {
       mode = 'live';
-      viewTickIndex = liveTickIndex;
+      viewTickIndex = Math.max(0, getTickCount() - 1);
     }
     renderAll();
   }
@@ -320,8 +357,8 @@
       const prevRank = prevLevel ? LEVEL_ORDER.indexOf(prevLevel) : -1;
       if (rank >= NOTIFY_THRESHOLD_RANK && rank > prevRank) {
         notifications.unshift({
-          id: `${zone.id}-${viewTickIndex}-${zone.level}`,
-          time: TICKS[viewTickIndex].time,
+          id: `${zone.id}-${viewTickIndex}-${zone.level}-${Date.now()}`,
+          time: new Date().toLocaleTimeString(),
           zoneId: zone.id,
           level: zone.level,
           text: `${zone.name} is now ${zone.levelLabel}.`,
@@ -402,5 +439,16 @@
     wireControls();
     wireNotifPanel();
     syncWithGlobalReplayState();
+    
+    // Auto-refresh when data.js fires event
+    document.addEventListener('sentinel:data-updated', (e) => {
+        if (mode === 'live') {
+            viewTickIndex = Math.max(0, getTickCount() - 1); // keep timeline scrub at end
+            renderAll();
+        } else if (e.detail.type === 'historical') {
+            // refresh scrubber bounds
+            renderScrubber();
+        }
+    });
   });
 })();

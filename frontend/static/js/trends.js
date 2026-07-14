@@ -1,24 +1,27 @@
 /* ==========================================================================
    SENTINEL — trends.js
    Gas Trend panel: line chart + Trend Predictor keypoints
-   (Current / Trend / In 15 min / Critical in). Gas-only per Module 4.
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  const GAS_SERIES = {
-    A: [18, 19, 19, 20, 21, 22],
-    B: [12, 14, 16, 18, 19, 20],
-    C: [130, 138, 145, 165, 172, 176],
-    D: [10, 11, 12, 12, 13, 12],
-    E: [8, 9, 9, 10, 10, 11],
-    F: [6, 7, 7, 8, 8, 9],
-  };
-
   const CRITICAL_PPM = 500;
-
   let activeZone = 'B';
+
+  function getGasSeries(zoneId) {
+    const ticks = window.SENTINEL_DATA.getHistoricalTicks();
+    return ticks.map(t => (t.zones[zoneId] && t.zones[zoneId].gas) ? t.zones[zoneId].gas : 0);
+  }
+
+  function getTimeLabels() {
+    const ticks = window.SENTINEL_DATA.getHistoricalTicks();
+    return ticks.map(t => {
+       if (t.time === 'Now' || t.time === '00:00:00') return t.time;
+       const parts = t.time.split(':');
+       return parts.length >= 2 ? `${parts[0]}:${parts[1]}` : t.time;
+    });
+  }
 
   function bandColor(v) {
     if (v > 500) return 'var(--risk-high)';
@@ -27,8 +30,8 @@
   }
 
   function slope(data) {
-    // Simple linear regression slope over the last N points (per-tick units)
     const n = data.length;
+    if (n < 2) return 0;
     const xs = data.map((_, i) => i);
     const xMean = xs.reduce((a, b) => a + b, 0) / n;
     const yMean = data.reduce((a, b) => a + b, 0) / n;
@@ -49,17 +52,16 @@
   function project15Min(data) {
     const m = slope(data);
     const current = data[data.length - 1];
-    // Assume each tick = 2 minutes, so 15 min ≈ 7.5 ticks ahead
     return Math.round(current + m * 7.5);
   }
 
   function timeToCritical(data) {
     const m = slope(data);
     const current = data[data.length - 1];
-    if (m <= 0) return null; // not rising, no ETA
+    if (m <= 0) return null;
     const ticksToCritical = (CRITICAL_PPM - current) / m;
     if (ticksToCritical <= 0) return 0;
-    return Math.round(ticksToCritical * 2); // minutes, assuming 2 min/tick
+    return Math.round(ticksToCritical * 2);
   }
 
   function render() {
@@ -70,9 +72,11 @@
     wireZoneButtons();
   }
 
-  // Scoped to #gasZoneButtons so Temperature Trend's buttons (same CSS
-  // class, different panel) are never picked up here.
   function wireZoneButtons() {
+    document.querySelectorAll('#gasZoneButtons .temp-panel__zone-btn').forEach((btn) => {
+      btn.replaceWith(btn.cloneNode(true));
+    });
+    
     document.querySelectorAll('#gasZoneButtons .temp-panel__zone-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('#gasZoneButtons .temp-panel__zone-btn').forEach((b) => b.classList.remove('is-active'));
@@ -86,7 +90,11 @@
 
   function drawLine(zoneId) {
     const container = document.getElementById('trendChart');
-    const data = GAS_SERIES[zoneId];
+    const data = getGasSeries(zoneId);
+    if (!data.length) {
+        container.innerHTML = `<div style="padding-left:34px; padding-top:50px; color:var(--text-muted);">Waiting for data...</div>`;
+        return;
+    }
 
     const w = container.clientWidth || 600;
     const h = 160;
@@ -104,9 +112,10 @@
     const step = Math.max(10, Math.round((scaleMax - scaleMin) / 5 / 10) * 10);
     for (let v = scaleMin; v <= scaleMax; v += step) gridLines.push(v);
 
-    const stepX = plotW / (data.length - 1);
+    const stepX = data.length > 1 ? plotW / (data.length - 1) : plotW;
 
     function yFor(v) {
+      if (scaleMax === scaleMin) return plotH / 2;
       return plotH - ((v - scaleMin) / (scaleMax - scaleMin)) * plotH;
     }
 
@@ -166,7 +175,8 @@
   }
 
   function renderKeypoints(zoneId) {
-    const data = GAS_SERIES[zoneId];
+    const data = getGasSeries(zoneId);
+    if (!data.length) return;
     const current = data[data.length - 1];
     const direction = trendDirection(data);
     const predicted = project15Min(data);
@@ -177,6 +187,7 @@
       : 'var(--text-muted)';
 
     const el = document.getElementById('trendKeypoints');
+    if (!el) return;
     el.innerHTML = `
       <div>
         <div class="keypoint__label">Current</div>
@@ -197,5 +208,13 @@
     `;
   }
 
-  document.addEventListener('DOMContentLoaded', render);
+  document.addEventListener('DOMContentLoaded', () => {
+      render();
+      document.addEventListener('sentinel:data-updated', (e) => {
+          if (e.detail.type === 'historical') {
+              drawLine(activeZone);
+              renderKeypoints(activeZone);
+          }
+      });
+  });
 })();

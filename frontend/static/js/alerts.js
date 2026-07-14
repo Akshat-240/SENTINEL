@@ -1,81 +1,14 @@
 /* ==========================================================================
    SENTINEL — alerts.js (v2)
    Renders the Alert Panel (4 zone cards, pill badges) + the soft floor-plan
-   heatmap teaser on index.html. Placeholder data — Day 4-7 wires to /api/risk.
+   heatmap teaser on index.html. Wires to /api/risk (via data.js).
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  const ZONES = [
-    {
-      id: 'A', name: 'Zone A', score: 22, level: 'normal', levelLabel: 'Normal',
-      note: 'All parameters within safe limits.',
-      factors: [
-        { label: 'Gas', value: '20 PPM' }, { label: 'Temperature', value: '32°C' },
-        { label: 'Permits', value: 'None active' }, { label: 'Workers', value: '1' },
-      ],
-      workers: [],
-    },
-    {
-      id: 'B', name: 'Zone B', score: 78, level: 'high', levelLabel: 'High Risk',
-      note: 'Dangerous compound conditions detected.',
-      factors: [
-        { label: 'Gas', value: '520 PPM' }, { label: 'Temperature', value: '58°C' },
-        { label: 'Permits', value: 'Hot Work + Confined Space' }, { label: 'Compound bonus', value: '+20' },
-      ],
-      workers: [
-        { id: 'Worker #04', status: 'Exit immediately', accent: 'high' },
-        { id: 'Worker #07', status: 'Move to safe zone', accent: 'warning' },
-        { id: 'Worker #11', status: 'Entry blocked', accent: 'high' },
-      ],
-    },
-    {
-      id: 'C', name: 'Zone C', score: 46, level: 'caution', levelLabel: 'Caution',
-      note: 'Conditions changing. Monitor closely.',
-      factors: [
-        { label: 'Gas', value: '180 PPM' }, { label: 'Temperature', value: '41°C' },
-        { label: 'Permits', value: 'Electrical' }, { label: 'Workers', value: '2' },
-      ],
-      workers: [],
-    },
-    {
-      id: 'D', name: 'Zone D', score: 15, level: 'normal', levelLabel: 'Normal',
-      note: 'All parameters within safe limits.',
-      factors: [
-        { label: 'Gas', value: '12 PPM' }, { label: 'Temperature', value: '29°C' },
-        { label: 'Permits', value: 'None active' }, { label: 'Workers', value: '0' },
-      ],
-      workers: [],
-    },
-    {
-      id: 'E', name: 'Zone E', score: 18, level: 'normal', levelLabel: 'Normal',
-      note: 'All parameters within safe limits.',
-      factors: [
-        { label: 'Gas', value: '11 PPM' }, { label: 'Temperature', value: '29°C' },
-        { label: 'Permits', value: 'None active' }, { label: 'Workers', value: '0' },
-      ],
-      workers: [],
-    },
-    {
-      id: 'F', name: 'Zone F', score: 14, level: 'normal', levelLabel: 'Normal',
-      note: 'All parameters within safe limits.',
-        factors: [
-          { label: 'Gas', value: '9 PPM' }, { label: 'Temperature', value: '27°C' },
-          { label: 'Permits', value: 'None active' }, { label: 'Workers', value: '0' },
-      ],
-      workers: [],
-    },
-  ];
-
-  const LEVEL_VAR = {
-    normal: '--risk-normal', caution: '--risk-caution', warning: '--risk-warning',
-    high: '--risk-high', critical: '--risk-critical', shutdown: '--risk-shutdown',
-  };
-  const LEVEL_TINT_VAR = {
-    normal: '--risk-normal-tint', caution: '--risk-caution-tint', warning: '--risk-warning-tint',
-    high: '--risk-high-tint', critical: '--risk-critical-tint', shutdown: '--risk-shutdown-tint',
-  };
+  const LEVEL_VAR = window.SENTINEL_DATA.LEVEL_VAR;
+  const LEVEL_TINT_VAR = window.SENTINEL_DATA.LEVEL_TINT_VAR;
 
   function pillStyle(level) {
     return `--pill-bg: var(${LEVEL_TINT_VAR[level]}); --pill-fg: var(${LEVEL_VAR[level]});`;
@@ -84,16 +17,34 @@
   function render() {
     const grid = document.getElementById('alertGrid');
     if (!grid) return;
-    grid.innerHTML = ZONES.map(cardTemplate).join('');
+    
+    const liveData = window.SENTINEL_DATA.getLiveState();
+    const zones = Object.values(liveData).sort((a, b) => b.score - a.score);
+    
+    if (zones.length === 0) return; // Wait for initial fetch
+    
+    // Only show top 4 most critical zones in the teaser grid
+    grid.innerHTML = zones.slice(0, 4).map(cardTemplate).join('');
     window.SentinelExpand.attach('#alertGrid', '.zone-card');
-    renderFloorplan();
+    renderFloorplan(zones);
+  }
+
+  function factorList(zone) {
+      return [
+        { label: 'Gas', value: `${zone.gas} PPM` }, 
+        { label: 'Temperature', value: `${zone.temp}°C` },
+        { label: 'Permits', value: zone.permits }, 
+        { label: 'Workers', value: zone.workers.length }
+      ];
   }
 
   function cardTemplate(zone) {
     const isQuiet = zone.level === 'normal';
     const accentVar = `var(${LEVEL_VAR[zone.level]})`;
-    const factorsHtml = zone.factors
+    
+    const factorsHtml = factorList(zone)
       .map((f) => `<div class="factor-row"><span>${f.label}</span><span>${f.value}</span></div>`).join('');
+      
     const workersHtml = zone.workers.length
       ? zone.workers.map((w) => `
           <div class="worker-mini-row">
@@ -102,8 +53,6 @@
           </div>`).join('')
       : `<p style="font-size:12px;color:var(--text-muted)">${isQuiet ? 'No workers currently assigned to this zone.' : 'No workers currently in this zone.'}</p>`;
 
-    // Section labels adapt to zone state — a Normal zone has nothing "alerting"
-    // about it, so the framing shouldn't imply danger where there is none.
     const factorsTitle = isQuiet ? 'Current conditions' : "Why it's alerting";
     const workersTitle = isQuiet ? 'Workers in zone' : "Who's at risk";
 
@@ -133,10 +82,10 @@
     `;
   }
 
-  function renderFloorplan() {
+  function renderFloorplan(zones) {
     const el = document.getElementById('heatmapTeaserPreview');
     if (!el) return;
-    el.innerHTML = ZONES.map((zone) => `
+    el.innerHTML = zones.map((zone) => `
       <div class="floorplan__room"
            style="--room-bg: var(${LEVEL_TINT_VAR[zone.level]}); --room-fg: var(${LEVEL_VAR[zone.level]});"
            title="${zone.name} — ${zone.levelLabel}">
@@ -146,5 +95,10 @@
     `).join('');
   }
 
-  document.addEventListener('DOMContentLoaded', render);
+  document.addEventListener('DOMContentLoaded', () => {
+      render();
+      document.addEventListener('sentinel:data-updated', (e) => {
+          if (e.detail.type === 'live') render();
+      });
+  });
 })();

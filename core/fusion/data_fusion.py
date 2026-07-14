@@ -66,10 +66,10 @@ def get_zone_snapshot(zone_id):
         cursor.execute('''
             SELECT timestamp, gas_ppm, temperature, pressure
             FROM sensor_readings
-            WHERE zone_id = ?
+            WHERE LOWER(zone_id) = ?
             ORDER BY timestamp DESC
             LIMIT 1
-        ''', (zone_id,))
+        ''', (zone_id.lower(),))
         sensor_row = cursor.fetchone()
         if sensor_row:
             snapshot["timestamp"] = sensor_row["timestamp"]
@@ -81,8 +81,8 @@ def get_zone_snapshot(zone_id):
         cursor.execute('''
             SELECT permit_id, type, worker_id
             FROM permits
-            WHERE zone_id = ? AND status = "ACTIVE"
-        ''', (zone_id,))
+            WHERE LOWER(zone_id) = ? AND status = "ACTIVE"
+        ''', (zone_id.lower(),))
         permit_rows = cursor.fetchall()
         for row in permit_rows:
             snapshot["active_permits"].append({
@@ -95,8 +95,8 @@ def get_zone_snapshot(zone_id):
         cursor.execute('''
             SELECT worker_id, entry_time, status
             FROM worker_locations
-            WHERE zone_id = ?
-        ''', (zone_id,))
+            WHERE LOWER(zone_id) = ?
+        ''', (zone_id.lower(),))
         worker_rows = cursor.fetchall()
         for row in worker_rows:
             snapshot["workers"].append({
@@ -110,10 +110,10 @@ def get_zone_snapshot(zone_id):
         cursor.execute('''
             SELECT worker_count, ppe_compliant_count
             FROM cctv_feed
-            WHERE zone_id = ?
+            WHERE LOWER(zone_id) = ?
             ORDER BY timestamp DESC
             LIMIT 1
-        ''', (zone_id,))
+        ''', (zone_id.lower(),))
         cctv_row = cursor.fetchone()
         if cctv_row:
             snapshot["cctv_worker_count"] = int(cctv_row["worker_count"]) if cctv_row["worker_count"] is not None else 0
