@@ -12,8 +12,6 @@ from config import settings
 from core.fusion.data_fusion import get_zone_snapshot
 from core.risk_engine.risk_calculator import calculate_risk
 from core.orchestrator.emergency import trigger_emergency_response
-from gemini.report_generator import generate_incident_report
-
 report_bp = Blueprint('report_bp', __name__, url_prefix='/api/report')
 
 def get_db_connection():
