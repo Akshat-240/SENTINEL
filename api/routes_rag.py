@@ -36,11 +36,10 @@ def auto_rag(zone_id):
         score = risk_result.get("final_score", 0)
         
         if score >= 75:
-            gas = snapshot.get("gas_ppm", 0)
-            temp = snapshot.get("temperature", 0)
-            query = f"Safety procedures for zone {zone_id} with gas {gas} PPM and temperature {temp}C"
-            results = retrieve(query)
-            return jsonify({"results": results[:3], "score": score, "context": query})
+            from core.rag.formatter import RAGFormatter
+            formatter = RAGFormatter()
+            output = formatter.format_for_dashboard(snapshot, score)
+            return jsonify(output)
         else:
             return jsonify({"message": "Risk below RAG trigger threshold", "score": score})
     except Exception as e:

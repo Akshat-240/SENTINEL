@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="day">
+<head>
+  <meta charset="UTF-8">
+  <script>
+  (function () {
+    try {
+      var theme = localStorage.getItem('sentinel_theme');
+      if (theme === 'day' || theme === 'night') {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+    } catch (e) { /* localStorage unavailable — falls back to default data-theme="day" already in the HTML */ }
+  })();
+</script>
+  <title>SENTINEL — Permits</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="../static/css/sentinel.css">
+  <link rel="stylesheet" href="../static/css/permits.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar__logo">
+    <span class="topbar__logo-mark"></span>
+    SENTINEL
+  </div>
+
+  <nav class="topbar__nav">
+    <a class="topbar__link" href="index.html">Dashboard</a>
+    <a class="topbar__link" href="heatmap.html">Heatmap</a>
+    <a class="topbar__link" href="workers.html">Workers</a>
+    <a class="topbar__link is-active" href="permits.html">Permits</a>
+    <a class="topbar__link" href="replay.html">Replay</a>
+    <a class="topbar__link" href="report.html">Report</a>
+    <a class="topbar__link" href="copilot.html">AI Assistant</a>
+  </nav>
+
+  <div class="topbar__right">
+    <span class="topbar__clock mono" id="clock">14:32:07</span>
+    <button class="theme-toggle" id="theme-toggle">NIGHT</button>
+  </div>
+</div>
+
+<div class="permits-shell">
+
+  <div class="permits-header">
+    <h1>Permits</h1>
+    <div class="permits-summary" id="permits-summary">Loading…</div>
+  </div>
+
+  <div class="permit-section">
+    <div class="permit-section-title">Blocked</div>
+    <div class="permit-cards" id="blocked-cards"></div>
+  </div>
+
+  <div class="permit-section">
+    <div class="permit-section-title">Flagged</div>
+    <div class="permit-cards" id="flagged-cards"></div>
+  </div>
+
+  <div class="permit-section">
+    <div class="permit-section-title">Active</div>
+    <div class="permit-cards" id="active-cards"></div>
+  </div>
+
+</div>
+
+<!-- ============ FLOATING ai_assistant ============ -->
+<div class="ai_assistant-fab">
+  <div class="ai_assistant-fab__panel">
+    <div class="ai_assistant-fab__header">
+      <span class="ai_assistant-fab__title">AI Assistant</span>
+      <a class="ai_assistant-fab__expand" href="copilot.html">Expand ↗</a>
+    </div>
+    <div class="ai_assistant-fab__messages">
+      Ask about zone status, permits, or recommended actions.
+    </div>
+    <div class="ai_assistant-fab__input-row">
+      <input class="ai_assistant-fab__input" type="text" placeholder="Ask SENTINEL..." />
+    </div>
+  </div>
+  <button class="ai_assistant-fab__button">SC</button>
+</div>
+
+<script src="../static/js/data.js"></script>
+<script src="../static/js/common.js"></script>
+<script src="../static/js/permits.js"></script>
+
+</body>
+</html>

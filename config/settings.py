@@ -3,6 +3,13 @@
 # All thresholds and constants live here
 # Change values here to adjust system behaviour globally
 
+import os
+from dotenv import load_dotenv
+
+# Resolve and load .env from the project root
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
+
 # RISK THRESHOLDS
 CAUTION_THRESHOLD = 41
 WARNING_THRESHOLD = 61

@@ -1,0 +1,148 @@
+/* ==========================================================================
+   SENTINEL — copilot.css
+   Full chat interface (copilot.html). Self-contained scrollable panel —
+   height is fixed via flex/vh, not measured in JS — so header/search stay
+   visible above the message list and the input stays visible below it,
+   with only the messages themselves scrolling. Same soft/rounded v2
+   language as the rest of the app (rounded cards, pill-ish inputs, no
+   icons, muted risk colors reserved for actual risk content only).
+   ========================================================================== */
+
+.copilot-shell {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 28px 22px 40px;
+  height: calc(100vh - 60px); /* 60px = topbar height */
+  display: flex;
+  flex-direction: column;
+}
+
+.copilot-panel {
+  flex: 1;
+  min-height: 0; /* allows the inner message list to actually shrink/scroll instead of overflowing the flex parent */
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* ---------- Header ---------- */
+.copilot-panel__header {
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.copilot-panel__title { font-size: 18px; margin-bottom: 4px; }
+.copilot-panel__subtitle { font-size: 12px; color: var(--text-muted); }
+
+/* ---------- Search ---------- */
+.copilot-panel__search-row {
+  padding: 12px 22px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.copilot-panel__search-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 9px 16px;
+  font-size: 13px;
+  font-family: var(--font-body);
+  background: var(--bg-sunken);
+  color: var(--text);
+}
+.copilot-panel__search-input::placeholder { color: var(--text-muted); }
+.copilot-panel__search-input:focus {
+  outline: none;
+  background: var(--bg-elevated);
+  border-color: var(--border-strong);
+}
+
+/* ---------- Messages ---------- */
+.copilot-panel__messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.copilot-msg { display: flex; flex-direction: column; max-width: 78%; }
+.copilot-msg.is-user { align-self: flex-end; align-items: flex-end; }
+.copilot-msg.is-assistant { align-self: flex-start; align-items: flex-start; }
+
+.copilot-msg__bubble {
+  font-size: 13px;
+  line-height: 1.55;
+  padding: 11px 15px;
+  border-radius: var(--radius-card);
+}
+.copilot-msg.is-user .copilot-msg__bubble {
+  background: var(--n-800);
+  color: var(--n-50);
+  border-bottom-right-radius: 4px;
+}
+[data-theme="night"] .copilot-msg.is-user .copilot-msg__bubble { background: var(--n-50); color: var(--n-800); }
+
+.copilot-msg.is-assistant .copilot-msg__bubble {
+  background: var(--bg-sunken);
+  color: var(--text-secondary);
+  border-bottom-left-radius: 4px;
+}
+
+.copilot-msg__time {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  padding: 0 4px;
+}
+
+.copilot-panel__empty {
+  margin: auto;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* ---------- Input row ---------- */
+.copilot-panel__input-row {
+  display: flex;
+  gap: 10px;
+  padding: 14px 22px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.copilot-panel__input {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 10px 16px;
+  font-size: 13px;
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+}
+.copilot-panel__input::placeholder { color: var(--text-muted); }
+.copilot-panel__input:focus { outline: none; border-color: var(--border-strong); }
+
+.copilot-panel__send {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--n-50);
+  background: var(--n-800);
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  transition: transform var(--dur-fast) var(--ease);
+}
+[data-theme="night"] .copilot-panel__send { background: var(--n-50); color: var(--n-800); }
+.copilot-panel__send:hover { transform: translateY(-1px); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 560px) {
+  .copilot-shell { padding: 16px 12px 20px; }
+  .copilot-msg { max-width: 90%; }
+}
