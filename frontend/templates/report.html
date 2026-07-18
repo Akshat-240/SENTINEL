@@ -1,131 +1,61 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="day">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <script>
-  (function () {
-    try {
-      var theme = localStorage.getItem('sentinel_theme');
-      if (theme === 'day' || theme === 'night') {
-        document.documentElement.setAttribute('data-theme', theme);
-      }
-    } catch (e) { /* localStorage unavailable — falls back to default data-theme="day" already in the HTML */ }
-  })();
-</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SENTINEL — Incident Report</title>
+  <title>SENTINEL — Report</title>
   <link rel="stylesheet" href="../static/css/sentinel.css" />
-  <link rel="stylesheet" href="../static/css/report.css" />
 </head>
 <body>
 
-  <!-- ============ TOP BAR ============ -->
-  <header class="topbar">
-    <div class="topbar__logo">
-      <span class="topbar__logo-mark"></span>
-      SENTINEL
-    </div>
+  <div class="app-shell">
+    
+    <aside class="sidebar">
+      <div class="sidebar__brand">🛡️ SENTINEL</div>
+      <nav class="sidebar__nav">
+        <a class="sidebar__link" href="/index.html">📊 Dashboard</a>
+        <a class="sidebar__link" href="/heatmap.html">🗺️ Heatmap</a>
+        <a class="sidebar__link" href="/replay.html">⏮️ Replay</a>
+        <a class="sidebar__link" href="/permits.html">📋 Permits</a>
+        <a class="sidebar__link" href="/workers.html">👷 Workers</a>
+        <a class="sidebar__link" href="/copilot.html">💬 Copilot</a>
+        <a class="sidebar__link is-active" href="/report.html">📄 Reports</a>
+      </nav>
+    </aside>
 
-    <nav class="topbar__nav">
-      <a class="topbar__link" href="index.html">Dashboard</a>
-      <a class="topbar__link" href="heatmap.html">Heatmap</a>
-      <a class="topbar__link" href="workers.html">Workers</a>
-      <a class="topbar__link" href="permits.html">Permits</a>
-      <a class="topbar__link" href="replay.html">Replay</a>
-      <a class="topbar__link is-active" href="report.html">Report</a>
-      <a class="topbar__link" href="copilot.html">AI Assistant</a>
-    </nav>
+    <main class="main-content">
+      <div class="mono" style="display:flex; justify-content:space-between; color:var(--text-secondary);">
+        <span>SENTINEL — Incident Report Generator</span>
+        <span class="color-normal">Ready</span>
+      </div>
 
-    <div class="topbar__right">
-      <button class="theme-toggle">Night mode</button>
-      <span class="topbar__clock mono">00:00:00</span>
-    </div>
-  </header>
-
-  <!-- ============ REPORT DOCUMENT ============ -->
-  <div class="report-shell">
-
-    <!-- HEADER: incident id/title, generated timestamp, zone(s), Download PDF -->
-    <div class="report-header">
-      <div class="report-header__inner">
-        <div>
-          <h1 class="report-header__title" id="reportTitle">Incident Report</h1>
-          <div class="report-header__meta" id="reportMeta"></div>
+      <div class="grid-2" style="flex:1;">
+        <!-- Generator Controls -->
+        <div class="ascii-box">
+          <div style="margin-bottom: 16px; border-bottom:1px solid var(--border); padding-bottom:8px;">GENERATE REPORT</div>
+          
+          <div style="margin-bottom: 16px;">
+            <label style="display:block; margin-bottom:8px; font-family:var(--font-mono); color:var(--text-secondary);">Select Zone ID:</label>
+            <select id="zoneSelect" style="width:100%; padding:8px; background:var(--bg-sunken); border:1px solid var(--border); color:var(--text); font-family:var(--font-mono);">
+              <!-- Populated dynamically by report.js -->
+            </select>
+          </div>
+          
+          <button id="generateBtn" style="width:100%; padding:12px; font-weight:bold; background:var(--border-strong);">RUN GENERATOR (10s)</button>
         </div>
-        <button class="report-download-btn" id="downloadPdfBtn">Download PDF</button>
+
+        <!-- Output View -->
+        <div class="ascii-box" style="display:flex; flex-direction:column;">
+          <div style="margin-bottom: 16px; border-bottom:1px solid var(--border); padding-bottom:8px;">REPORT OUTPUT</div>
+          
+          <div id="reportOutput" style="flex:1; overflow-y:auto; font-family:var(--font-mono); font-size:13px; color:var(--text-muted); white-space:pre-wrap;">
+            Select a zone and click Generate to produce an incident report.
+          </div>
+        </div>
       </div>
-    </div>
-
-    <!-- 1. SUMMARY STRIP -->
-    <section class="report-section">
-
- 
-
-    <!-- 1. SUMMARY STRIP -->
-    <section class="report-section">
-      <div class="report-section__title">Summary</div>
-      <div class="report-summary-strip" id="summaryStrip"></div>
-    </section>
-
-    <!-- 6. RECOMMENDED ACTIONS -->
-    <section class="report-section card">
-      <div class="report-section__title">Recommended Actions</div>
-      <ol class="report-actions" id="recommendedActions"></ol>
-    </section>
-
-    <!-- 2. EVENT TIMELINE (condensed, static) -->
-    <section class="report-section card">
-      <div class="report-section__title">Event Timeline</div>
-      <div class="report-timeline" id="eventTimeline"></div>
-    </section>
-
-    <!-- 3. COMPOUND FACTORS DETECTED -->
-    <section class="report-section card">
-      <div class="report-section__title">Compound Factors Detected</div>
-      <div class="report-factor-list" id="compoundFactors"></div>
-    </section>
-
-    <!-- 5. REGULATORY VIOLATIONS FLAGGED -->
-    <section class="report-section card">
-      <div class="report-section__title">Regulatory Violations Flagged</div>
-      <div id="regulatoryViolations"></div>
-    </section>
-
-    <!-- 7. TIMESTAMPED EVIDENCE LOG -->
-    <section class="report-section card">
-      <div class="report-section__title">Timestamped Evidence Log</div>
-      <table class="report-evidence-table">
-        <thead>
-          <tr><th>Time</th><th>Zone</th><th>Reading</th><th>Value</th><th>Score</th></tr>
-        </thead>
-        <tbody id="evidenceLog"></tbody>
-      </table>
-    </section>
-
-    <!-- 4. HISTORICAL SIMILARITY (closing section) -->
-    <section class="report-similarity" id="historicalSimilarity"></section>
-
+    </main>
   </div>
 
-  <!-- ============ FLOATING ai_assistant ============ -->
-  <div class="ai_assistant-fab">
-    <div class="ai_assistant-fab__panel">
-      <div class="ai_assistant-fab__header">
-        <span class="ai_assistant-fab__title">AI Assistant</span>
-        <a class="ai_assistant-fab__expand" href="copilot.html">Expand ↗</a>
-      </div>
-      <div class="ai_assistant-fab__messages">
-        Ask about zone status, permits, or recommended actions.
-      </div>
-      <div class="ai_assistant-fab__input-row">
-        <input class="ai_assistant-fab__input" type="text" placeholder="Ask SENTINEL..." />
-      </div>
-    </div>
-    <button class="ai_assistant-fab__button">SC</button>
-  </div>
-
-  <script src="../static/js/data.js"></script>
-  <script src="../static/js/common.js"></script>
   <script src="../static/js/report.js"></script>
 </body>
 </html>

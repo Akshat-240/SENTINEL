@@ -1,6 +1,7 @@
 import os
 import sys
 import sqlite3
+import json
 from flask import Blueprint, jsonify
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -18,6 +19,16 @@ def get_db_connection():
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
+
+@dashboard_bp.route('/config', methods=['GET'])
+def get_config():
+    try:
+        config_path = os.path.join(PROJECT_ROOT, 'config', 'zones.json')
+        with open(config_path, 'r', encoding='utf-8') as f:
+            zones_data = json.load(f)
+        return jsonify(zones_data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @dashboard_bp.route('/zones', methods=['GET'])
 def get_zones():

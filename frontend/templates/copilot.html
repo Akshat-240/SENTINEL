@@ -1,93 +1,49 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="day">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <script>
-  (function () {
-    try {
-      var theme = localStorage.getItem('sentinel_theme');
-      if (theme === 'day' || theme === 'night') {
-        document.documentElement.setAttribute('data-theme', theme);
-      }
-    } catch (e) { /* localStorage unavailable — falls back to default data-theme="day" already in the HTML */ }
-  })();
-</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SENTINEL — Copilot</title>
   <link rel="stylesheet" href="../static/css/sentinel.css" />
-  <link rel="stylesheet" href="../static/css/copilot.css" />
 </head>
 <body>
 
-  <!-- ============ TOP BAR ============ -->
-  <header class="topbar">
-    <div class="topbar__logo">
-      <span class="topbar__logo-mark"></span>
-      SENTINEL
-    </div>
+  <div class="app-shell">
+    
+    <aside class="sidebar">
+      <div class="sidebar__brand">🛡️ SENTINEL</div>
+      <nav class="sidebar__nav">
+        <a class="sidebar__link" href="/index.html">📊 Dashboard</a>
+        <a class="sidebar__link" href="/heatmap.html">🗺️ Heatmap</a>
+        <a class="sidebar__link" href="/replay.html">⏮️ Replay</a>
+        <a class="sidebar__link" href="/permits.html">📋 Permits</a>
+        <a class="sidebar__link" href="/workers.html">👷 Workers</a>
+        <a class="sidebar__link is-active" href="/copilot.html">💬 Copilot</a>
+        <a class="sidebar__link" href="/report.html">📄 Reports</a>
+      </nav>
+    </aside>
 
-    <nav class="topbar__nav">
-      <a class="topbar__link" href="index.html">Dashboard</a>
-      <a class="topbar__link" href="heatmap.html">Heatmap</a>
-      <a class="topbar__link" href="workers.html">Workers</a>
-      <a class="topbar__link" href="permits.html">Permits</a>
-      <a class="topbar__link" href="replay.html">Replay</a>
-      <a class="topbar__link" href="report.html">Report</a>
-      <a class="topbar__link is-active" href="copilot.html">AI Assistant</a>
-    </nav>
+    <main class="main-content">
+      <div class="mono" style="display:flex; justify-content:space-between; color:var(--text-secondary);">
+        <span>SENTINEL — RAG Assistant</span>
+        <span class="color-normal">Online</span>
+      </div>
 
-    <div class="topbar__right">
-      <button class="theme-toggle">Night mode</button>
-      <span class="topbar__clock mono">00:00:00</span>
-    </div>
-  </header>
+      <div class="ascii-box" style="flex:1; display:flex; flex-direction:column;">
+        <div style="margin-bottom: 16px; border-bottom:1px solid var(--border); padding-bottom:8px;">TERMINAL INTERFACE</div>
+        
+        <div id="chatWindow" style="flex:1; overflow-y:auto; font-family:var(--font-mono); font-size:14px; margin-bottom:16px;">
+          <div style="color:var(--text-secondary); margin-bottom:12px;">> SYSTEM: RAG Pipeline initialized. How can I help you analyze the plant data?</div>
+        </div>
 
-  <!-- ============ COPILOT PAGE ============ -->
-  <!-- No floating ai_assistant fab here — you're already on the full page.
-       Conversation state is shared with the widget (see copilot.js) so
-       history carries over regardless of which one the user opened. -->
-  <div class="copilot-shell">
-
-    <div class="copilot-panel card">
-
-      <!-- Header -->
-      <div class="copilot-panel__header">
-        <div>
-          <h1 class="copilot-panel__title">AI Assistant</h1>
-          <div class="copilot-panel__subtitle">Ask about zone status, permits, or recommended actions.</div>
+        <div style="display:flex; gap:12px; border-top:1px dashed var(--border); padding-top:16px;">
+          <input type="text" id="chatInput" placeholder="Ask about safety protocols or current risks..." style="flex:1; background:var(--bg-sunken); border:1px solid var(--border); color:var(--text); padding:8px 12px; font-family:var(--font-mono);" />
+          <button id="chatBtn">SEND</button>
         </div>
       </div>
-
-      <!-- Search (simple text-match against message history) -->
-      <div class="copilot-panel__search-row">
-        <input
-          class="copilot-panel__search-input"
-          type="text"
-          id="copilotSearchInput"
-          placeholder="Search conversation..."
-        />
-      </div>
-
-      <!-- Message history -->
-      <div class="copilot-panel__messages" id="copilotMessages"></div>
-
-      <!-- Input -->
-      <div class="copilot-panel__input-row">
-        <input
-          class="copilot-panel__input"
-          type="text"
-          id="copilotInput"
-          placeholder="Ask SENTINEL..."
-        />
-        <button class="copilot-panel__send" id="copilotSendBtn">Send</button>
-      </div>
-
-    </div>
-
+    </main>
   </div>
 
-  <script src="../static/js/data.js"></script>
-  <script src="../static/js/common.js"></script>
   <script src="../static/js/copilot.js"></script>
 </body>
 </html>

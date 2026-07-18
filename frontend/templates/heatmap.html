@@ -1,124 +1,58 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="day">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <script>
-  (function () {
-    try {
-      var theme = localStorage.getItem('sentinel_theme');
-      if (theme === 'day' || theme === 'night') {
-        document.documentElement.setAttribute('data-theme', theme);
-      }
-    } catch (e) { /* localStorage unavailable — falls back to default data-theme="day" already in the HTML */ }
-  })();
-</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SENTINEL — Heatmap</title>
   <link rel="stylesheet" href="../static/css/sentinel.css" />
-  <link rel="stylesheet" href="../static/css/heatmap.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
 
-  <!-- ============ TOP BAR ============ -->
-  <header class="topbar">
-    <div class="topbar__logo">
-      <span class="topbar__logo-mark"></span>
-      SENTINEL
-    </div>
+  <div class="app-shell">
+    
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+      <div class="sidebar__brand">🛡️ SENTINEL</div>
+      <nav class="sidebar__nav">
+        <a class="sidebar__link" href="/index.html">📊 Dashboard</a>
+        <a class="sidebar__link is-active" href="/heatmap.html">🗺️ Heatmap</a>
+        <a class="sidebar__link" href="/replay.html">⏮️ Replay</a>
+        <a class="sidebar__link" href="/permits.html">📋 Permits</a>
+        <a class="sidebar__link" href="/workers.html">👷 Workers</a>
+        <a class="sidebar__link" href="/copilot.html">💬 Copilot</a>
+        <a class="sidebar__link" href="/report.html">📄 Reports</a>
+      </nav>
+    </aside>
 
-    <nav class="topbar__nav">
-      <a class="topbar__link" href="index.html">Dashboard</a>
-      <a class="topbar__link is-active" href="heatmap.html">Heatmap</a>
-      <a class="topbar__link" href="workers.html">Workers</a>
-      <a class="topbar__link" href="permits.html">Permits</a>
-      <a class="topbar__link" href="replay.html">Replay</a>
-      <a class="topbar__link" href="report.html">Report</a>
-      <a class="topbar__link" href="copilot.html">AI Assistant</a>
-    </nav>
-
-    <div class="topbar__right">
-      <button class="theme-toggle">Night mode</button>
-      <span class="topbar__clock mono">00:00:00</span>
-      <span class="pill" style="--pill-bg: var(--risk-high-tint); --pill-fg: var(--risk-high);">
-        <span class="pill__dot"></span>
-        Zone B · High Risk
-      </span>
-    </div>
-  </header>
-
-  <!-- ============ TOP-RIGHT NOTIFICATION PANEL ============ -->
-  <div class="notif-panel" id="notifPanel">
-    <button type="button" class="notif-panel__collapsed" id="notifCollapsedOpen">
-      <span class="notif-panel__collapsed-text" id="notifCollapsedText"></span>
-      <span class="notif-panel__expand-hint">Expand</span>
-    </button>
-    <div class="notif-panel__list">
-      <div class="notif-panel__close-row">
-        <span class="notif-panel__title">Notifications</span>
-        <button type="button" class="notif-panel__close" id="notifClose">Close</button>
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <div class="mono" style="display:flex; justify-content:space-between; color:var(--text-secondary);">
+        <span>SENTINEL — Heatmap</span>
+        <span id="heatmapStatus" class="color-normal">Live Tracking</span>
       </div>
-      <div id="notifList"></div>
-    </div>
+
+      <div class="grid-2">
+        <!-- Floorplan Map -->
+        <div class="ascii-box" style="height: 500px; display:flex; flex-direction:column;">
+          <div style="margin-bottom: 16px; border-bottom:1px solid var(--border); padding-bottom:8px;">PLANT FLOORPLAN</div>
+          <div id="heatmapFloorplan" class="loading-overlay" style="flex:1; position:relative; overflow:hidden;">
+            <div class="spinner"></div>
+          </div>
+        </div>
+
+        <!-- Disaster DNA Panel -->
+        <div class="ascii-box" style="height: 500px; display:flex; flex-direction:column;">
+          <div style="margin-bottom: 16px; border-bottom:1px solid var(--border); padding-bottom:8px;">DISASTER DNA</div>
+          <div id="disasterDna" style="flex:1; overflow-y:auto;">
+            <div class="loading-overlay" style="height:100%;">Select a zone to view Disaster DNA.</div>
+          </div>
+        </div>
+      </div>
+
+    </main>
   </div>
 
-  <!-- ============ MAIN LAYOUT ============ -->
-  <div class="heatmap-shell">
-
-    <!-- Mode bar -->
-    <div class="mode-bar" id="modeBar">
-  <div class="mode-bar__status" id="modeLabel"></div>
-</div>
-
-    <!-- Map -->
-    <div class="card map-card">
-      <div class="map-card__surface" id="mapSurface"></div>
-      <button class="map-recenter-btn" id="recenterBtn" type="button">⤾ Recenter</button>
-    </div>
-
-    <!-- Scrubber (visible only in Historical mode, via CSS) -->
-    <div class="card scrubber-card">
-  <div class="scrubber__row">
-    <button class="scrubber__play" id="playBtn">▶</button>
-    <input class="scrubber__track" id="scrubberTrack" type="range" min="0" max="6" step="1" value="6" />
-    <span class="scrubber__time mono" id="scrubberTime"></span>
-  </div>
-  <div class="scrubber__return-row">
-    <button class="mode-bar__return" id="returnLiveBtn">Return to Live</button>
-  </div>
-</div>
-
-    <!-- Detail panel -->
-    <div class="card detail-panel">
-      <div class="detail-panel__header">
-        <span class="detail-panel__title">Zone Detail</span>
-      </div>
-      <span class="detail-panel__subtitle" id="detailSubtitle"></span>
-      <div id="detailPanelBody"></div>
-    </div>
-
-  </div>
-
-  <!-- ============ FLOATING ai_assistant ============ -->
-  <div class="ai_assistant-fab">
-    <div class="ai_assistant-fab__panel">
-      <div class="ai_assistant-fab__header">
-        <span class="ai_assistant-fab__title">AI Assistant</span>
-        <a class="ai_assistant-fab__expand" href="copilot.html">Expand ↗</a>
-      </div>
-      <div class="ai_assistant-fab__messages">
-        Ask about zone status, permits, or recommended actions.
-      </div>
-      <div class="ai_assistant-fab__input-row">
-        <input class="ai_assistant-fab__input" type="text" placeholder="Ask SENTINEL..." />
-      </div>
-    </div>
-    <button class="ai_assistant-fab__button">SC</button>
-  </div>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="../static/js/data.js"></script>
-  <script src="../static/js/common.js"></script>
   <script src="../static/js/heatmap.js"></script>
 </body>
 </html>

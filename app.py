@@ -4,7 +4,7 @@ import time
 import sqlite3
 import threading
 import traceback
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 from flask_cors import CORS
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -145,7 +145,10 @@ def background_task():
         time.sleep(30)
 
 def main():
-    app = Flask(__name__)
+    app = Flask(__name__,
+        template_folder='frontend/templates',
+        static_folder='frontend/static')
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
     CORS(app)
     
     app.register_blueprint(dashboard_bp)
@@ -155,13 +158,37 @@ def main():
     app.register_blueprint(rag_bp)
     app.register_blueprint(report_bp)
 
-    @app.route('/', methods=['GET'])
-    def root():
-        return jsonify({
-            "status": "SENTINEL online", 
-            "version": "4.0", 
-            "message": "Zero Harm Intelligence Active"
-        })
+    @app.route('/')
+    def index():
+        return render_template('index.html')
+
+    @app.route('/index.html')
+    def index_html():
+        return render_template('index.html')
+
+    @app.route('/heatmap.html')
+    def heatmap():
+        return render_template('heatmap.html')
+
+    @app.route('/workers.html')
+    def workers():
+        return render_template('workers.html')
+
+    @app.route('/permits.html')
+    def permits():
+        return render_template('permits.html')
+
+    @app.route('/replay.html')
+    def replay():
+        return render_template('replay.html')
+
+    @app.route('/report.html')
+    def report():
+        return render_template('report.html')
+
+    @app.route('/copilot.html')
+    def copilot():
+        return render_template('copilot.html')
 
     init_db()
     

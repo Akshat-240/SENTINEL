@@ -1,66 +1,167 @@
 {
-  "scenario_name": "ZONE_A Gas Leak - Full Demo Sequence",
-  "description": "The exact sequence the live demo replays. Matches critical_scenario.csv timing for ZONE_A. Total runtime: ~11 minutes at 30-second ticks.",
-  "timeline": [
+  "scenario_name": "Visakhapatnam Simulation",
+  "zone_id": "ZONE_A",
+  "description": "Simulates the 10-minute escalation pattern before the January 2025 incident",
+  "total_steps": 10,
+  "steps": [
     {
-      "time": "09:00:00",
-      "event": "sensor_reading",
-      "zone_id": "ZONE_A",
+      "step": 1,
+      "time_offset_seconds": 0,
       "gas_ppm": 20,
-      "risk_level": "NORMAL",
-      "risk_score": 12,
-      "narration": "Baseline readings. Everything normal in ZONE_A."
+      "temperature": 34,
+      "pressure": 1.2,
+      "worker_count": 2,
+      "active_permits": [],
+      "expected_risk_score": 12,
+      "expected_alert_level": "NORMAL",
+      "event_description": "Normal operations. All parameters within safe limits.",
+      "demo_narration": "Normal operations at Visakhapatnam-style facility. All green.",
+      "ui_focus": "dashboard"
     },
     {
-      "time": "09:02:30",
-      "event": "sensor_reading",
-      "zone_id": "ZONE_A",
+      "step": 2,
+      "time_offset_seconds": 60,
       "gas_ppm": 45,
-      "risk_level": "NORMAL",
-      "risk_score": 18,
-      "narration": "Slight upward drift, still within safe range."
+      "temperature": 36,
+      "pressure": 1.2,
+      "worker_count": 2,
+      "active_permits": [],
+      "expected_risk_score": 18,
+      "expected_alert_level": "NORMAL",
+      "event_description": "Normal operations. All parameters within safe limits.",
+      "demo_narration": "Normal operations at Visakhapatnam-style facility. All green.",
+      "ui_focus": "dashboard"
     },
     {
-      "time": "09:03:30",
-      "event": "permit_issued",
-      "zone_id": "ZONE_A",
-      "permit_type": "Hot Work",
-      "risk_level": "CAUTION",
-      "risk_score": 35,
-      "narration": "Hot Work permit approved in ZONE_A - a Confined Space permit is already active here. Compound risk engine flags the overlap."
+      "step": 3,
+      "time_offset_seconds": 120,
+      "gas_ppm": 120,
+      "temperature": 38,
+      "pressure": 1.2,
+      "worker_count": 2,
+      "active_permits": [],
+      "expected_risk_score": 22,
+      "expected_alert_level": "NORMAL",
+      "event_description": "Normal operations. All parameters within safe limits.",
+      "demo_narration": "Normal operations at Visakhapatnam-style facility. All green.",
+      "ui_focus": "dashboard"
     },
     {
-      "time": "09:04:30",
-      "event": "worker_entry",
-      "zone_id": "ZONE_A",
-      "worker_id": "W04",
-      "risk_level": "WARNING",
-      "risk_score": 61,
-      "narration": "Worker enters ZONE_A while gas trend continues rising and two hazardous permits are active simultaneously."
+      "step": 4,
+      "time_offset_seconds": 180,
+      "gas_ppm": 180,
+      "temperature": 40,
+      "pressure": 1.3,
+      "worker_count": 3,
+      "active_permits": [
+        "HOT_WORK"
+      ],
+      "expected_risk_score": 35,
+      "expected_alert_level": "CAUTION",
+      "event_description": "Gas levels starting to rise.",
+      "demo_narration": "Hot work permit issued. Gas levels starting to rise. System detects CAUTION but no single sensor would alarm yet.",
+      "ui_focus": "heatmap"
     },
     {
-      "time": "09:05:00",
-      "event": "sensor_reading",
-      "zone_id": "ZONE_A",
+      "step": 5,
+      "time_offset_seconds": 240,
+      "gas_ppm": 250,
+      "temperature": 45,
+      "pressure": 1.3,
+      "worker_count": 3,
+      "active_permits": [
+        "HOT_WORK"
+      ],
+      "expected_risk_score": 52,
+      "expected_alert_level": "CAUTION",
+      "event_description": "Gas levels starting to rise.",
+      "demo_narration": "Hot work permit issued. Gas levels starting to rise. System detects CAUTION but no single sensor would alarm yet.",
+      "ui_focus": "heatmap"
+    },
+    {
+      "step": 6,
+      "time_offset_seconds": 300,
+      "gas_ppm": 340,
+      "temperature": 52,
+      "pressure": 1.4,
+      "worker_count": 3,
+      "active_permits": [
+        "HOT_WORK",
+        "CONFINED_SPACE"
+      ],
+      "expected_risk_score": 65,
+      "expected_alert_level": "WARNING",
+      "event_description": "Compound risk detected.",
+      "demo_narration": "SENTINEL detects compound risk — HOT WORK + CONFINED SPACE + rising gas. This combination preceded the 2025 disaster.",
+      "ui_focus": "permits"
+    },
+    {
+      "step": 7,
+      "time_offset_seconds": 360,
+      "gas_ppm": 500,
+      "temperature": 58,
+      "pressure": 1.5,
+      "worker_count": 3,
+      "active_permits": [
+        "HOT_WORK",
+        "CONFINED_SPACE"
+      ],
+      "expected_risk_score": 78,
+      "expected_alert_level": "HIGH_RISK",
+      "event_description": "High risk threshold crossed.",
+      "demo_narration": "Regulatory Shadow Twin blocks new permit requests. Workers being tracked. Disaster DNA showing 73% Visakhapatnam match.",
+      "ui_focus": "workers"
+    },
+    {
+      "step": 8,
+      "time_offset_seconds": 420,
+      "gas_ppm": 650,
+      "temperature": 63,
+      "pressure": 1.6,
+      "worker_count": 3,
+      "active_permits": [
+        "HOT_WORK",
+        "CONFINED_SPACE"
+      ],
+      "expected_risk_score": 85,
+      "expected_alert_level": "HIGH_RISK",
+      "event_description": "High risk threshold crossed.",
+      "demo_narration": "Regulatory Shadow Twin blocks new permit requests. Workers being tracked. Disaster DNA showing 73% Visakhapatnam match.",
+      "ui_focus": "workers"
+    },
+    {
+      "step": 9,
+      "time_offset_seconds": 480,
       "gas_ppm": 847,
-      "risk_level": "CRITICAL",
-      "risk_score": 88,
-      "narration": "Gas concentration spikes sharply. Similarity Engine matches this pattern to the Visakhapatnam 2025 incident profile."
+      "temperature": 67,
+      "pressure": 1.8,
+      "worker_count": 3,
+      "active_permits": [
+        "HOT_WORK",
+        "CONFINED_SPACE"
+      ],
+      "expected_risk_score": 92,
+      "expected_alert_level": "CRITICAL",
+      "event_description": "Critical threshold breached.",
+      "demo_narration": "CRITICAL threshold breached. Emergency Orchestrator fires automatically. Evacuation triggered. Evidence being preserved.",
+      "ui_focus": "replay"
     },
     {
-      "time": "09:05:30",
-      "event": "alert_triggered",
-      "zone_id": "ZONE_A",
-      "risk_level": "SHUTDOWN",
-      "risk_score": 96,
-      "narration": "Emergency Orchestrator triggers automatic shutdown protocol and evacuation alert for ZONE_A."
+      "step": 10,
+      "time_offset_seconds": 540,
+      "gas_ppm": 920,
+      "temperature": 72,
+      "pressure": 2.0,
+      "worker_count": 3,
+      "active_permits": [
+        "HOT_WORK",
+        "CONFINED_SPACE"
+      ],
+      "expected_risk_score": 98,
+      "expected_alert_level": "EMERGENCY",
+      "event_description": "Emergency shutdown.",
+      "demo_narration": "EMERGENCY SHUTDOWN. Report auto-generating. This is what SENTINEL prevents.",
+      "ui_focus": "report"
     }
-  ],
-  "matched_disaster_profile": "visakhapatnam_2025",
-  "key_talking_points": [
-    "Compound risk detection: two overlapping hazardous permits flagged automatically",
-    "Historical similarity: matched to a real past incident in seconds",
-    "Time from first warning sign to shutdown: under 6 minutes",
-    "Every step logged for the incident replay and report generator"
   ]
 }

@@ -1,189 +1,68 @@
 /* ==========================================================================
-   SENTINEL — workers.js (v2)
-   Single source of truth for worker data. Uses live API data from data.js.
+   SENTINEL — workers.js
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  const D = window.SENTINEL_DATA || {};
-  const LEVEL_VAR = D.LEVEL_VAR;
-  const LEVEL_TINT_VAR = D.LEVEL_TINT_VAR;
-  const ZONE_AREA_NAME = D.ZONE_AREA_NAME || {};
+  function renderWorkers() {
+    const liveData = window.SENTINEL_DATA.getLiveState();
+    const zones = Object.values(liveData);
+    if (zones.length === 0) return;
 
-  const URGENCY_ORDER = ['shutdown', 'critical', 'high', 'warning', 'caution', 'normal'];
+    const workersEl = document.getElementById('workersList');
+    if (!workersEl) return;
 
-  function pillStyle(accent) {
-    return `--pill-bg: var(${LEVEL_TINT_VAR[accent]}); --pill-fg: var(${LEVEL_VAR[accent]});`;
-  }
+    // Aggregate all workers from all zones
+    let allWorkers = [];
+    zones.forEach(z => {
+      if (z.raw.snapshot.workers && z.raw.snapshot.workers.length > 0) {
+        z.raw.snapshot.workers.forEach(w => {
+          const shortId = z.raw.zone_id.toUpperCase().replace('ZONE_', '');
+          const areaName = window.SENTINEL_DATA.ZONE_AREA_NAME[shortId] || z.raw.zone_id;
+          allWorkers.push({
+            id: w.worker_id,
+            zone: `${z.raw.zone_id.toUpperCase()} (${areaName})`,
+            time: w.entry_time,
+            score: z.score
+          });
+        });
+      }
+    });
 
-  function exposureMinutes(w) {
-    if (/enter/i.test(w.exposure)) return Infinity; 
-    const m = parseInt(w.exposure, 10);
-    return Number.isNaN(m) ? -1 : m;
-  }
+    // Sort by risk exposure
+    allWorkers.sort((a, b) => b.score - a.score);
 
-  function renderExposurePanel() {
-    const panel = document.getElementById('workerList');
-    if (!panel) return;
-    
-    const roster = window.SENTINEL_DATA.WORKERS || [];
-    const atRisk = roster.filter((w) => w.accent !== 'normal');
-
-    if (!atRisk.length) {
-      panel.innerHTML = `
-        <div class="worker-panel__empty">
-          <div class="worker-panel__empty-dot"></div>
-          All workers currently in safe zones.
-        </div>`;
+    if (allWorkers.length === 0) {
+      workersEl.innerHTML = '<div style="color:var(--text-muted)">No workers active in tracked zones.</div>';
+      workersEl.classList.remove('loading-overlay');
       return;
     }
 
-    const sorted = [...atRisk].sort(
-      (a, b) => URGENCY_ORDER.indexOf(a.accent) - URGENCY_ORDER.indexOf(b.accent)
-    );
-
-    panel.innerHTML = sorted.map((w) => `
-      <div class="worker-row">
-        <div>
-          <div class="worker-row__id">${w.id}</div>
-          <div class="worker-row__meta">${w.zone}</div>
+    const html = allWorkers.map(w => {
+      let colorClass = 'color-normal';
+      let action = 'ROUTINE MONITORING';
+      
+      if (w.score >= 75) { colorClass = 'color-critical'; action = 'EVACUATE IMMEDIATELY'; }
+      else if (w.score >= 50) { colorClass = 'color-warning'; action = 'MOVE TO SAFE ZONE'; }
+      else if (w.score >= 30) { colorClass = 'color-caution'; action = 'HIGH VIGILANCE'; }
+      
+      return `
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-family:var(--font-mono); font-size:14px; border-bottom:1px solid var(--border); padding-bottom:8px;">
+          <div style="flex:1; font-weight:600;">WORKER ${w.id}</div>
+          <div style="flex:1; color:var(--text-secondary)">LOC: ${w.zone}</div>
+          <div style="flex:1; text-align:right;" class="${colorClass}">${action} (Risk: ${w.score})</div>
         </div>
-        <div class="worker-row__right">
-          <div class="worker-row__exposure">${w.exposure}</div>
-          <span class="pill" style="${pillStyle(w.accent)}">${w.status}</span>
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
+
+    workersEl.innerHTML = html;
+    workersEl.classList.remove('loading-overlay');
   }
 
-  let activeZoneFilter = 'all';
-  let searchQuery = '';
-  let sortState = { key: 'urgency', dir: 'asc' };
-
-  function filteredRoster() {
-    const roster = window.SENTINEL_DATA.WORKERS || [];
-    return roster.filter((w) => {
-      const wZoneLetter = w.zone.replace('Zone ', '');
-      const zoneOk = activeZoneFilter === 'all' || wZoneLetter === activeZoneFilter;
-      const q = searchQuery.trim().toLowerCase();
-      const searchOk = !q
-        || w.id.toLowerCase().includes(q)
-        || w.status.toLowerCase().includes(q)
-        || (w.permit || '').toLowerCase().includes(q)
-        || (ZONE_AREA_NAME[wZoneLetter] || '').toLowerCase().includes(q);
-      return zoneOk && searchOk;
-    });
-  }
-
-  function sortRoster(list) {
-    const dirMul = sortState.dir === 'asc' ? 1 : -1;
-    return [...list].sort((a, b) => {
-      let cmp = 0;
-      switch (sortState.key) {
-        case 'id': cmp = a.id.localeCompare(b.id, undefined, { numeric: true }); break;
-        case 'zone': cmp = a.zone.localeCompare(b.zone); break;
-        case 'urgency': cmp = URGENCY_ORDER.indexOf(a.accent) - URGENCY_ORDER.indexOf(b.accent); break;
-        case 'exposure': cmp = exposureMinutes(a) - exposureMinutes(b); break;
-        case 'shift': cmp = (a.shift || '').localeCompare(b.shift || ''); break;
-        default: cmp = 0;
-      }
-      return cmp * dirMul;
-    });
-  }
-
-  function renderSummary() {
-    const el = document.getElementById('workersSummary');
-    if (!el) return;
-    const roster = window.SENTINEL_DATA.WORKERS || [];
-    const total = roster.length;
-    const flagged = roster.filter((w) => w.accent === 'caution' || w.accent === 'warning').length;
-    const critical = roster.filter((w) => w.accent === 'high' || w.accent === 'critical' || w.accent === 'shutdown').length;
-    el.innerHTML =
-      `<strong>${total}</strong> Workers &middot; ` +
-      `<strong>${flagged}</strong> Flagged &middot; ` +
-      `<strong>${critical}</strong> Critical`;
-  }
-
-  function rowHtml(w) {
-    const wZoneLetter = w.zone.replace('Zone ', '');
-    const area = ZONE_AREA_NAME[wZoneLetter] ? ` &middot; ${ZONE_AREA_NAME[wZoneLetter]}` : '';
-    return `
-      <tr>
-        <td class="workers-table__id">${w.id}</td>
-        <td>${w.zone}${area}</td>
-        <td><span class="pill" style="${pillStyle(w.accent)}"><span class="pill__dot"></span>${w.status}</span></td>
-        <td class="workers-table__exposure">${w.exposure}</td>
-        <td>${w.permit || 'None'}</td>
-        <td>${w.shift || 'Day'}</td>
-      </tr>
-    `;
-  }
-
-  function renderTable() {
-    const tbody = document.getElementById('workersTableBody');
-    if (!tbody) return;
-
-    const list = sortRoster(filteredRoster());
-
-    tbody.innerHTML = list.length
-      ? list.map(rowHtml).join('')
-      : `<tr class="workers-table__empty-row"><td colspan="6">No workers match this filter.</td></tr>`;
-
-    document.querySelectorAll('.workers-table thead th[data-sort]').forEach((th) => {
-      th.classList.toggle('is-sorted', th.dataset.sort === sortState.key);
-    });
-  }
-
-  function wireTableControls() {
-    document.querySelectorAll('.workers-table thead th[data-sort]').forEach((th) => {
-      th.addEventListener('click', () => {
-        const key = th.dataset.sort;
-        if (sortState.key === key) {
-          sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
-        } else {
-          sortState = { key, dir: 'asc' };
-        }
-        renderTable();
+  document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener('sentinel:data-updated', (e) => {
+          if (e.detail.type === 'live') renderWorkers();
       });
-    });
-
-    document.querySelectorAll('.workers-zone-tab').forEach((tab) => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.workers-zone-tab').forEach((t) => t.classList.remove('is-active'));
-        tab.classList.add('is-active');
-        activeZoneFilter = tab.dataset.zone;
-        renderTable();
-      });
-    });
-
-    const search = document.getElementById('workersSearch');
-    if (search) {
-      search.addEventListener('input', (e) => {
-        searchQuery = e.target.value;
-        renderTable();
-      });
-    }
-  }
-
-  function init() {
-    renderExposurePanel();
-    if (document.getElementById('workersTableBody')) {
-      renderSummary();
-      wireTableControls();
-      renderTable();
-    }
-    
-    document.addEventListener('sentinel:data-updated', (e) => {
-      if (e.detail.type === 'live') {
-        renderExposurePanel();
-        if (document.getElementById('workersTableBody')) {
-          renderSummary();
-          renderTable();
-        }
-      }
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', init);
+  });
 })();

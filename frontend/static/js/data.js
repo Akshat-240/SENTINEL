@@ -14,10 +14,7 @@ window.SENTINEL_DATA = (function () {
     F: { lat: 17.6090, lng: 83.1920 },
   };
 
-  const ZONE_AREA_NAME = {
-    A: 'Sinter Plant', B: 'Coke Oven Battery', C: 'Blast Furnace Area',
-    D: 'Steel Melt Shop', E: 'Rolling Mill', F: 'Raw Material Yard',
-  };
+  let ZONE_AREA_NAME = {};
 
   const LEVEL_ORDER = ['normal', 'caution', 'warning', 'high', 'critical', 'shutdown'];
   const LEVEL_LABEL = {
@@ -134,11 +131,31 @@ window.SENTINEL_DATA = (function () {
     }
   }
 
+  async function fetchConfig() {
+    try {
+      const res = await fetch('http://localhost:5000/api/dashboard/config');
+      if (!res.ok) throw new Error('API error');
+      const configData = await res.json();
+      
+      configData.forEach(zone => {
+          const shortId = zone.zone_id.toUpperCase().replace('ZONE_', '');
+          ZONE_AREA_NAME[shortId] = zone.name;
+      });
+      document.dispatchEvent(new CustomEvent('sentinel:config-loaded', { detail: { configData } }));
+    } catch (err) {
+      console.error('Failed to fetch config:', err);
+    }
+  }
+
   // Start polling
-  setInterval(pollLiveState, 2000);
-  setInterval(pollReplayTimeline, 5000);
-  pollLiveState();
-  pollReplayTimeline();
+  async function init() {
+      await fetchConfig();
+      setInterval(pollLiveState, 2000);
+      setInterval(pollReplayTimeline, 5000);
+      pollLiveState();
+      pollReplayTimeline();
+  }
+  init();
 
   return {
     ZONE_COORDS,

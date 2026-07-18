@@ -1,102 +1,82 @@
 /* ==========================================================================
-   SENTINEL — alerts.js (v2)
-   Renders the Alert Panel (4 zone cards, pill badges) + the soft floor-plan
-   heatmap teaser on index.html. Wires to /api/risk (via data.js).
+   SENTINEL — alerts.js (ASCII Dashboard)
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  const LEVEL_VAR = window.SENTINEL_DATA.LEVEL_VAR;
-  const LEVEL_TINT_VAR = window.SENTINEL_DATA.LEVEL_TINT_VAR;
-
-  function pillStyle(level) {
-    return `--pill-bg: var(${LEVEL_TINT_VAR[level]}); --pill-fg: var(${LEVEL_VAR[level]});`;
-  }
-
   function render() {
-    const grid = document.getElementById('alertGrid');
-    if (!grid) return;
-    
     const liveData = window.SENTINEL_DATA.getLiveState();
     const zones = Object.values(liveData).sort((a, b) => b.score - a.score);
-    
-    if (zones.length === 0) return; // Wait for initial fetch
-    
-    // Only show top 4 most critical zones in the teaser grid
-    grid.innerHTML = zones.slice(0, 4).map(cardTemplate).join('');
-    window.SentinelExpand.attach('#alertGrid', '.zone-card');
-    renderFloorplan(zones);
-  }
+    if (zones.length === 0) return;
 
-  function factorList(zone) {
-      return [
-        { label: 'Gas', value: `${zone.gas} PPM` }, 
-        { label: 'Temperature', value: `${zone.temp}°C` },
-        { label: 'Permits', value: zone.permits }, 
-        { label: 'Workers', value: zone.workers.length }
-      ];
-  }
+    // 1. Plant Overview
+    const overviewEl = document.getElementById('plantOverview');
+    if (overviewEl) {
+      const rows = zones.map(z => {
+        let icon = '🟢';
+        let colorClass = 'color-normal';
+        if (z.score >= 75) { icon = '🔴'; colorClass = 'color-critical'; }
+        else if (z.score >= 50) { icon = '🟠'; colorClass = 'color-warning'; }
+        else if (z.score >= 30) { icon = '🟡'; colorClass = 'color-caution'; }
+        
+        // Find area name
+        const areaName = window.SENTINEL_DATA.ZONE_AREA_NAME[z.raw.zone_id.toUpperCase().replace('ZONE_', '')] || z.raw.zone_id;
+        
+        return `<div class="zone-row">
+          <div>${icon} ${z.raw.zone_id.toUpperCase().padEnd(8, ' ')} ${areaName.padEnd(25, ' ')}</div>
+          <div class="${colorClass}">Risk: ${z.score}</div>
+        </div>`;
+      }).join('');
+      overviewEl.innerHTML = rows;
+      overviewEl.classList.remove('loading-overlay');
+    }
 
-  function cardTemplate(zone) {
-    const isQuiet = zone.level === 'normal';
-    const accentVar = `var(${LEVEL_VAR[zone.level]})`;
-    
-    const factorsHtml = factorList(zone)
-      .map((f) => `<div class="factor-row"><span>${f.label}</span><span>${f.value}</span></div>`).join('');
-      
-    const workersHtml = zone.workers.length
-      ? zone.workers.map((w) => `
-          <div class="worker-mini-row">
-            <span class="worker-mini-row__id">${w.id}</span>
-            <span class="pill" style="${pillStyle(w.accent)}">${w.status}</span>
-          </div>`).join('')
-      : `<p style="font-size:12px;color:var(--text-muted)">${isQuiet ? 'No workers currently assigned to this zone.' : 'No workers currently in this zone.'}</p>`;
+    // 2. Last Updated
+    const lastUpdatedEl = document.getElementById('lastUpdated');
+    if (lastUpdatedEl) {
+      const now = new Date();
+      lastUpdatedEl.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+    }
 
-    const factorsTitle = isQuiet ? 'Current conditions' : "Why it's alerting";
-    const workersTitle = isQuiet ? 'Workers in zone' : "Who's at risk";
+    // 3. Active Alerts
+    const alertsEl = document.getElementById('activeAlerts');
+    if (alertsEl) {
+      const activeAlerts = zones.filter(z => z.score >= 50);
+      if (activeAlerts.length === 0) {
+        alertsEl.innerHTML = '<div style="color:var(--text-muted)">No active alerts.</div>';
+      } else {
+        const rows = activeAlerts.map(z => {
+          return `<div style="margin-bottom:12px;">
+            <div style="font-weight:600; color:var(--risk-high)">[ALERT] ${z.raw.zone_id.toUpperCase()}</div>
+            <div style="color:var(--text-secondary)">${z.note}</div>
+          </div>`;
+        }).join('');
+        alertsEl.innerHTML = rows;
+      }
+      alertsEl.classList.remove('loading-overlay');
+    }
 
-    return `
-      <div class="zone-card ${isQuiet ? 'is-quiet' : 'is-elevated'}" style="--card-accent: ${accentVar}" data-zone="${zone.id}">
-        <div class="zone-card__collapsed">
-          <span class="zone-card__zone">${zone.name}</span>
-          <div class="zone-card__score">${zone.score}</div>
-          <span class="pill" style="${pillStyle(zone.level)}">
-            <span class="pill__dot"></span>${zone.levelLabel}
-          </span>
-          <div class="zone-card__note">${zone.note}</div>
-        </div>
-        <div class="zone-card__expanded">
-          <div class="zone-card__expanded-header">
-            <h3 style="font-size:16px;">${zone.name}</h3>
-            <span class="pill" style="${pillStyle(zone.level)}">${zone.levelLabel}</span>
-            <span class="zone-card__close">Close</span>
-          </div>
-          <div class="zone-card__section-title">${factorsTitle}</div>
-          ${factorsHtml}
-          <div class="expanded-divider"></div>
-          <div class="zone-card__section-title">${workersTitle}</div>
-          ${workersHtml}
-        </div>
-      </div>
-    `;
-  }
-
-  function renderFloorplan(zones) {
-    const el = document.getElementById('heatmapTeaserPreview');
-    if (!el) return;
-    el.innerHTML = zones.map((zone) => `
-      <div class="floorplan__room"
-           style="--room-bg: var(${LEVEL_TINT_VAR[zone.level]}); --room-fg: var(${LEVEL_VAR[zone.level]});"
-           title="${zone.name} — ${zone.levelLabel}">
-        <div class="floorplan__room-zone">${zone.name}</div>
-        <div class="floorplan__room-status">${zone.levelLabel} · ${zone.score}</div>
-      </div>
-    `).join('');
+    // 4. Compound Risks
+    const compoundEl = document.getElementById('compoundRisks');
+    if (compoundEl) {
+      const compoundRiskZones = zones.filter(z => z.raw.combinations_detected && z.raw.combinations_detected.length > 0);
+      if (compoundRiskZones.length === 0) {
+        compoundEl.innerHTML = '<div style="color:var(--text-muted)">No compound risks detected.</div>';
+      } else {
+        const rows = compoundRiskZones.map(z => {
+          return `<div style="margin-bottom:12px;">
+            <div style="font-weight:600; color:var(--risk-warning)">[COMPOUND] ${z.raw.zone_id.toUpperCase()}</div>
+            <div style="color:var(--text-secondary)">${z.raw.combinations_detected.join(' + ')}</div>
+          </div>`;
+        }).join('');
+        compoundEl.innerHTML = rows;
+      }
+      compoundEl.classList.remove('loading-overlay');
+    }
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-      render();
       document.addEventListener('sentinel:data-updated', (e) => {
           if (e.detail.type === 'live') render();
       });
