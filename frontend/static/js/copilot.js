@@ -38,7 +38,7 @@
     appendMessage('SENTINEL', 'Processing...');
 
     try {
-      const res = await fetch('http://localhost:5000/api/rag/query', {
+      const res = await fetch('http://localhost:5000/api/rag/copilot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: query, zone_id: 'ZONE_A' })
@@ -52,16 +52,7 @@
       if (data.error) {
           appendMessage('SENTINEL', 'Unable to connect to intelligence pipeline. Check API configuration.', true);
       } else {
-          let responseText = 'Query processed. Intelligence pipeline active.';
-          
-          if (data && data.length > 0) {
-              responseText += '\n\nRETRIEVED DOCUMENTS:\n';
-              data.forEach((match, idx) => {
-                  const snippet = match.text ? match.text.substring(0, 100).replace(/\n/g, ' ') + '...' : '';
-                  responseText += `[${idx+1}] ${match.source}: ${snippet}\n`;
-              });
-          }
-          
+          let responseText = data.answer || 'No response generated.';
           appendMessage('SENTINEL', responseText.trim());
       }
     } catch (err) {

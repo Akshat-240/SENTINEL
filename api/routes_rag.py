@@ -44,3 +44,27 @@ def auto_rag(zone_id):
             return jsonify({"message": "Risk below RAG trigger threshold", "score": score})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@rag_bp.route('/copilot', methods=['POST'])
+def copilot_chat():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No JSON payload provided"}), 400
+            
+        query = data.get("query")
+        zone_id = data.get("zone_id", "ZONE_A")
+        
+        if not query:
+            return jsonify({"error": "query is required"}), 400
+            
+        from core.rag.formatter import RAGFormatter
+        from core.fusion.data_fusion import get_zone_snapshot
+        
+        snapshot = get_zone_snapshot(zone_id)
+        formatter = RAGFormatter()
+        output = formatter.format_for_copilot(query, snapshot)
+        return jsonify(output)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
