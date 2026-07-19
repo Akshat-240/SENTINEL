@@ -1,44 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SENTINEL — Workers</title>
-  <link rel="stylesheet" href="../static/css/sentinel.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENTINEL | Worker Safety</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/sentinel.css">
+    <link rel="stylesheet" href="../static/css/workers.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
-<body>
+<body class="sentinel-body">
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar__brand">SENTINEL</div>
+            <nav class="sidebar__nav">
+                <a class="sidebar__link" href="/index.html">📊 Dashboard</a>
+                <a class="sidebar__link" href="/heatmap.html">🗺️ Heatmap</a>
+                <a class="sidebar__link" href="/replay.html">⏮️ Replay</a>
+                <a class="sidebar__link" href="/permits.html">📋 Permits</a>
+                <a class="sidebar__link is-active" href="/workers.html">👷 Workers</a>
+                <a class="sidebar__link" href="/copilot.html">💬 Copilot</a>
+                <a class="sidebar__link" href="/report.html">📄 Reports</a>
+            </nav>
+            <div class="sidebar__footer">SYSTEM ONLINE</div>
+        </aside>
 
-  <div class="app-shell">
-    
-    <aside class="sidebar">
-      <div class="sidebar__brand">🛡️ SENTINEL</div>
-      <nav class="sidebar__nav">
-        <a class="sidebar__link" href="/index.html">📊 Dashboard</a>
-        <a class="sidebar__link" href="/heatmap.html">🗺️ Heatmap</a>
-        <a class="sidebar__link" href="/replay.html">⏮️ Replay</a>
-        <a class="sidebar__link" href="/permits.html">📋 Permits</a>
-        <a class="sidebar__link is-active" href="/workers.html">👷 Workers</a>
-        <a class="sidebar__link" href="/copilot.html">💬 Copilot</a>
-        <a class="sidebar__link" href="/report.html">📄 Reports</a>
-      </nav>
-    </aside>
+        <!-- Main Content -->
+        <main class="main-content sentinel-main">
+            <header class="page-header">
+                <div class="ph-title">
+                    <div class="ph-title-text">BIOMETRIC & PERSONNEL TRACKING</div>
+                    <div class="ph-tag pulse-glow">LIVE HUD</div>
+                </div>
+                <div class="header-controls">
+                    <select id="workers-zone-select" class="sentinel-select">
+                        <option value="all">Global Matrix</option>
+                    </select>
+                </div>
+            </header>
 
-    <main class="main-content">
-      <div class="mono" style="display:flex; justify-content:space-between; color:var(--text-secondary);">
-        <span>SENTINEL — Worker Safety</span>
-        <span class="color-normal">Live Tracking</span>
-      </div>
+            <div class="hud-layout">
+                <!-- Top KPI Row -->
+                <div class="hud-kpi-grid">
+                    <div class="hud-kpi-card glass-panel" id="kpi-total">
+                        <div class="hud-kpi-title">Active Personnel</div>
+                        <div class="hud-kpi-value" id="val-total-workers">0</div>
+                        <div class="kpi-accent"></div>
+                    </div>
+                    <div class="hud-kpi-card glass-panel" id="kpi-risk">
+                        <div class="hud-kpi-title">Critical Status</div>
+                        <div class="hud-kpi-value danger-glow" id="val-risk-workers">0</div>
+                        <div class="kpi-accent accent-danger"></div>
+                    </div>
+                    <div class="hud-kpi-card glass-panel" id="kpi-compliance">
+                        <div class="hud-kpi-title">Compliance Index</div>
+                        <div class="hud-kpi-value safe-glow" id="val-compliance">0%</div>
+                        <div class="kpi-accent accent-safe"></div>
+                    </div>
+                    <div class="hud-kpi-card glass-panel" id="kpi-permits">
+                        <div class="hud-kpi-title">Active Permits</div>
+                        <div class="hud-kpi-value" id="val-active-permits">0</div>
+                        <div class="kpi-accent accent-warning"></div>
+                    </div>
+                </div>
 
-      <div class="ascii-box" style="flex:1;">
-        <div style="margin-bottom: 16px; border-bottom:1px solid var(--border); padding-bottom:8px;">WORKER EXPOSURE DIRECTORY</div>
-        <div id="workersList" class="loading-overlay">
-          <div class="spinner"></div> Loading workers...
-        </div>
-      </div>
-    </main>
-  </div>
+                <div class="hud-main-grid">
+                    <!-- Density Map Chart -->
+                    <div class="hud-panel glass-panel hud-center-panel">
+                        <div class="section-label">
+                            <span class="sl-text">DENSITY & RISK DISTRIBUTION</span>
+                            <div class="sl-line"></div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="density-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Compliance Matrix -->
+                    <div class="hud-panel glass-panel hud-side-panel">
+                        <div class="section-label">
+                            <span class="sl-text">COMPLIANCE MATRIX</span>
+                            <div class="sl-line"></div>
+                        </div>
+                        <div id="compliance-matrix" class="comp-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
 
-  <script src="../static/js/data.js"></script>
-  <script src="../static/js/workers.js"></script>
+                <!-- Bottom Panel -->
+                <div class="hud-panel glass-panel hud-bottom-panel">
+                    <div class="section-label">
+                        <span class="sl-text">ACTIVE PERMITS LOG</span>
+                        <div class="sl-line"></div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="sentinel-table">
+                            <thead>
+                                <tr>
+                                    <th>Permit ID</th>
+                                    <th>Zone</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Worker ID</th>
+                                    <th>Created At</th>
+                                </tr>
+                            </thead>
+                            <tbody id="permits-table">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/workers.js"></script>
 </body>
 </html>

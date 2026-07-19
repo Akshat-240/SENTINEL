@@ -1,47 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SENTINEL — Replay</title>
-  <link rel="stylesheet" href="../static/css/sentinel.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENTINEL | Incident Replay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/sentinel.css">
+    <link rel="stylesheet" href="../static/css/replay.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
-<body>
+<body class="sentinel-body">
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar__brand">SENTINEL</div>
+            <nav class="sidebar__nav">
+                <a class="sidebar__link" href="/index.html">📊 Dashboard</a>
+                <a class="sidebar__link" href="/heatmap.html">🗺️ Heatmap</a>
+                <a class="sidebar__link is-active" href="/replay.html">⏮️ Replay</a>
+                <a class="sidebar__link" href="/permits.html">📋 Permits</a>
+                <a class="sidebar__link" href="/workers.html">👷 Workers</a>
+                <a class="sidebar__link" href="/copilot.html">💬 Copilot</a>
+                <a class="sidebar__link" href="/report.html">📄 Reports</a>
+            </nav>
+            <div class="sidebar__footer">SYSTEM ONLINE</div>
+        </aside>
 
-  <div class="app-shell">
-    
-    <!-- SIDEBAR NAVIGATION -->
-    <aside class="sidebar">
-      <div class="sidebar__brand">🛡️ SENTINEL</div>
-      <nav class="sidebar__nav">
-        <a class="sidebar__link" href="/index.html">📊 Dashboard</a>
-        <a class="sidebar__link" href="/heatmap.html">🗺️ Heatmap</a>
-        <a class="sidebar__link is-active" href="/replay.html">⏮️ Replay</a>
-        <a class="sidebar__link" href="/permits.html">📋 Permits</a>
-        <a class="sidebar__link" href="/workers.html">👷 Workers</a>
-        <a class="sidebar__link" href="/copilot.html">💬 Copilot</a>
-        <a class="sidebar__link" href="/report.html">📄 Reports</a>
-      </nav>
-    </aside>
+        <main class="main-content">
+            <header class="page-header">
+                <h1>INCIDENT REPLAY</h1>
+                <p class="subtitle">TIMELINE ANALYSIS</p>
+                <div class="controls">
+                    <select id="replay-zone-select" class="zone-selector"></select>
+                    <button id="btn-play" class="btn-play">PLAY</button>
+                </div>
+            </header>
 
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
-      <div class="mono" style="display:flex; justify-content:space-between; color:var(--text-secondary);">
-        <span>SENTINEL — Incident Replay</span>
-        <span class="color-warning">Historical Data</span>
-      </div>
+            <div class="stats-row">
+                <div class="stat-card">
+                    <span class="stat-label">Total Events</span>
+                    <span class="stat-value" id="stat-total">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Critical Alerts</span>
+                    <span class="stat-value" id="stat-critical">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Peak Score</span>
+                    <span class="stat-value" id="stat-peak">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Zone Name</span>
+                    <span class="stat-value" id="stat-zone">--</span>
+                </div>
+            </div>
 
-      <div class="ascii-box" style="flex:1; display:flex; flex-direction:column;">
-        <div style="margin-bottom: 16px; border-bottom:1px solid var(--border); padding-bottom:8px;">TIMELINE REPLAY</div>
-        
-        <div id="replayTimeline" class="loading-overlay" style="flex:1; overflow-y:auto; padding-right:16px;">
-          <div class="spinner"></div> Loading historical data...
-        </div>
-      </div>
-    </main>
-  </div>
+            <div class="timeline-container">
+                <canvas id="timeline-chart"></canvas>
+            </div>
 
-  <script src="../static/js/data.js"></script>
-  <script src="../static/js/replay.js"></script>
+            <div class="events-container">
+                <h3>Critical Events</h3>
+                <div id="events-panel" class="events-panel">
+                    <!-- Events populated via JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="/static/js/replay.js"></script>
 </body>
 </html>

@@ -1,261 +1,445 @@
-/* ==========================================================================
-   SENTINEL — report.css
-   Page-specific additions for report.html. Single-column, document-style
-   layout (not card-grid) — reads like a formal/printable incident report.
-   Color is the most restrained of any page: only the alert-level badge
-   (Section 1) and small inline accents on flagged violations (Section 5)
-   use risk color. Everything else stays neutral for report credibility.
-   Reuses tokens from sentinel.css (colors, radii, shadows, .card, .pill).
-   ========================================================================== */
+/* report.css - SENTINEL Reports Module Redesign */
 
-.report-shell {
-  max-width: 780px;
-  margin: 0 auto;
-  padding: 28px 22px 120px;
+.report-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    position: relative;
+    overflow: hidden; /* To contain absolute overlays */
 }
 
-/* ---------- Header ----------
-   Plain document-style heading — no card, no background, no border,
-   no shadow, no fixed/sticky positioning. Scrolls away naturally with
-   the rest of the page, like the title of a printed report. */
-.report-header {
-  margin-bottom: 28px;
+/* ── BENTO GRID LAYOUT ────────────────────────────────────────*/
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: auto auto 1fr;
+    gap: 20px;
+    height: 100%;
+    max-height: calc(100vh - 150px);
 }
 
-.report-header__inner {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
+.bento-grid.hidden {
+    display: none;
 }
 
-.report-header__title { font-size: 22px; margin-bottom: 6px; }
-
-.report-header__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 14px;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-.report-header__meta strong { color: var(--text-secondary); font-weight: 600; }
-
-.report-download-btn {
-  flex-shrink: 0;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--n-50);
-  background: var(--n-800);
-  padding: 10px 18px;
-  border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-card);
-  transition: transform var(--dur-fast) var(--ease);
-}
-[data-theme="night"] .report-download-btn { background: var(--n-50); color: var(--n-800); }
-.report-download-btn:hover { transform: translateY(-1px); }
-
-/* ---------- Section shell ---------- */
-.report-section {
-  margin-top: 34px;
-}
-.report-section__title {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 14px;
+.bento-box {
+    background: var(--bg-panel);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--border-panel);
+    border-radius: var(--r-md);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--glass-shadow);
+    transition: transform var(--t-mid), box-shadow var(--t-mid), border-color var(--t-mid);
+    position: relative;
+    overflow: hidden;
 }
 
-/* ---------- Section 1: Summary Strip ---------- */
-.report-summary-strip {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-}
-@media (max-width: 560px) { .report-summary-strip { grid-template-columns: 1fr; } }
-
-.report-summary-stat {
-  padding: 16px 18px;
-}
-.report-summary-stat__label { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
-.report-summary-stat__value { font-family: var(--font-mono); font-size: 22px; font-weight: 500; color: var(--text); }
-
-/* This is the one place besides Section 5 where risk color is allowed to
-   appear — the alert level reached, shown as a pill. */
-.report-summary-stat__pill-row { margin-top: 2px; }
-
-/* ---------- Section 6: Recommended Actions ---------- */
-.report-actions {
-  list-style: none;
-  counter-reset: report-actions;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.report-actions li {
-  counter-increment: report-actions;
-  display: flex;
-  gap: 12px;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--text-secondary);
-}
-.report-actions li::before {
-  content: counter(report-actions);
-  flex-shrink: 0;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--bg-sunken);
-  color: var(--text);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.bento-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
 }
 
-/* ---------- Section 2: Event Timeline (condensed, static — no click/expand) ---------- */
-.report-timeline {
-  position: relative;
-  padding-left: 22px;
-}
-.report-timeline::before {
-  content: '';
-  position: absolute;
-  left: 5px;
-  top: 4px;
-  bottom: 4px;
-  width: 2px;
-  background: var(--border-strong);
-}
-.report-timeline-entry {
-  position: relative;
-  padding-bottom: 14px;
-}
-.report-timeline-entry:last-child { padding-bottom: 0; }
-.report-timeline-entry__dot {
-  position: absolute;
-  left: -22px;
-  top: 4px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--entry-color, var(--risk-normal));
-  border: 2px solid var(--bg);
-  box-shadow: 0 0 0 1.5px var(--entry-color, var(--risk-normal));
-}
-.report-timeline-entry__row {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  flex-wrap: wrap;
-  font-size: 13px;
-}
-.report-timeline-entry__time { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
-.report-timeline-entry__text { color: var(--text-secondary); }
-.report-timeline-entry__score { font-family: var(--font-mono); font-size: 12px; color: var(--entry-color, var(--text)); margin-left: auto; }
+/* Grid Areas Allocation */
+.bento-overview { grid-column: span 8; }
+.bento-score    { grid-column: span 4; display: flex; align-items: center; justify-content: center; }
+.bento-factors  { grid-column: span 4; grid-row: span 2; }
+.bento-compound { grid-column: span 4; }
+.bento-timeline { grid-column: span 4; grid-row: span 2; }
+.bento-evidence { grid-column: span 4; grid-row: span 2; }
+.bento-recs     { grid-column: span 8; }
+.bento-actions  { grid-column: span 12; flex-direction: row; justify-content: flex-end; padding: 12px 20px; align-items: center;}
 
-/* ---------- Section 3: Compound Factors Detected ---------- */
-.report-factor-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.report-factor-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 13px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border);
-  color: var(--text-secondary);
-}
-.report-factor-row:last-child { border-bottom: none; }
-.report-factor-row__points { font-family: var(--font-mono); color: var(--text); flex-shrink: 0; }
-
-/* ---------- Section 5: Regulatory Violations Flagged ---------- */
-.report-violation {
-  border-left: 3px solid var(--violation-color, var(--risk-warning));
-  padding: 4px 0 4px 14px;
-  margin-bottom: 16px;
-}
-.report-violation:last-child { margin-bottom: 0; }
-.report-violation__top {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 4px;
-}
-.report-violation__title { font-size: 13px; font-weight: 600; color: var(--text); }
-.report-violation__meta { font-size: 12px; font-family: var(--font-mono); color: var(--text-muted); }
-/* Body text stays neutral even on a flagged violation — only the left
-   border and the rule reference carry color. */
-.report-violation__text { font-size: 13px; line-height: 1.55; color: var(--text-secondary); max-width: 68ch; }
-.report-violation__rule { font-family: var(--font-mono); font-size: 11px; color: var(--violation-color, var(--risk-warning)); margin-top: 6px; }
-
-/* ---------- Section 7: Timestamped Evidence Log ---------- */
-.report-evidence-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.report-evidence-table th {
-  text-align: left;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border-strong);
-}
-.report-evidence-table td {
-  padding: 10px 12px;
-  font-size: 12px;
-  font-family: var(--font-mono);
-  color: var(--text-secondary);
-  border-bottom: 1px solid var(--border);
-}
-.report-evidence-table tr:last-child td { border-bottom: none; }
-.report-evidence-table td:first-child, .report-evidence-table th:first-child { font-family: var(--font-mono); }
-
-/* ---------- Section 4: Historical Similarity (closing section) ---------- */
-.report-similarity {
-  text-align: center;
-  padding: 46px 20px 10px;
-  border-top: 1px solid var(--border);
-}
-.report-similarity__value {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 56px;
-  color: var(--text);
-  line-height: 1;
-  margin-bottom: 14px;
-}
-.report-similarity__label {
-  font-size: 13px;
-  color: var(--text-secondary);
-  max-width: 46ch;
-  margin: 0 auto 10px;
-  line-height: 1.5;
-}
-.report-similarity__window {
-  font-size: 12px;
-  color: var(--text-muted);
+/* Specific Overrides for layout fit */
+.bento-factors, .bento-compound, .bento-timeline, .bento-evidence, .bento-recs {
+    overflow-y: auto;
 }
 
-/* ---------- Print (Download PDF) ---------- */
+/* ── BENTO HEADER ─────────────────────────────────────────────*/
+.bento-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-shrink: 0;
+}
+
+/* ── OVERVIEW BOX ─────────────────────────────────────────────*/
+.overview-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+.zone-primary h2 {
+    font-size: 32px;
+    color: var(--text-a);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+    text-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
+
+.alert-status {
+    text-align: right;
+}
+.alert-label {
+    font-family: var(--f-mono);
+    font-size: 10px;
+    color: var(--text-b);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+}
+.alert-value {
+    font-family: var(--f-head);
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 4px 16px;
+    border-radius: var(--r-sm);
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--border-panel);
+}
+
+.sensor-snapshot {
+    display: flex;
+    gap: 32px;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+.sensor-metric {
+    display: flex;
+    flex-direction: column;
+}
+.sensor-label {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    color: var(--c-cyan);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+.sensor-value {
+    font-family: var(--f-head);
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text-a);
+}
+
+/* ── SCORE BOX ────────────────────────────────────────────────*/
+.score-display {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+.chart-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.score-number {
+    font-family: var(--f-head);
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--text-a);
+    z-index: 2;
+    text-shadow: 0 0 20px rgba(0,0,0,0.8);
+}
+
+/* ── FACTORS BOX ──────────────────────────────────────────────*/
+.factors-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.factor-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.factor-header {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--f-mono);
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+.factor-bar-bg {
+    height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.factor-bar-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 3px;
+}
+
+/* ── LISTS (Compound & Recs) ──────────────────────────────────*/
+.compound-list, .recs-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.compound-list li, .recs-list li {
+    padding: 12px 16px;
+    background: rgba(0,0,0,0.3);
+    border-left: 2px solid var(--c-cyan);
+    font-family: var(--f-body);
+    font-size: 13px;
+    color: var(--text-a);
+    line-height: 1.5;
+}
+.compound-list li {
+    border-left-color: var(--c-high);
+    background: linear-gradient(90deg, rgba(255,68,68,0.1), transparent);
+}
+
+/* ── TIMELINE ─────────────────────────────────────────────────*/
+.timeline-container {
+    position: relative;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.timeline-container::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(180deg, var(--c-cyan-dim), transparent);
+}
+.timeline-node {
+    position: relative;
+}
+.timeline-node::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 4px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--c-cyan);
+    box-shadow: 0 0 10px var(--c-cyan);
+    transform: translateX(-50%);
+}
+.timeline-node.sev-critical::before { background: var(--c-critical); box-shadow: 0 0 10px var(--c-critical); }
+.timeline-node.sev-high::before { background: var(--c-high); box-shadow: 0 0 10px var(--c-high); }
+.timeline-node.sev-warning::before { background: var(--c-warning); box-shadow: 0 0 10px var(--c-warning); }
+
+.tl-time {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    color: var(--text-b);
+    margin-bottom: 4px;
+}
+.tl-desc {
+    font-size: 13px;
+    color: var(--text-a);
+}
+
+/* ── EVIDENCE LOG ─────────────────────────────────────────────*/
+.evidence-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.ev-item {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: var(--r-sm);
+    padding: 12px;
+    transition: background var(--t-fast);
+}
+.ev-item:hover {
+    background: rgba(0,212,255,0.05);
+    border-color: rgba(0,212,255,0.2);
+}
+.ev-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-family: var(--f-mono);
+    font-size: 11px;
+}
+.ev-type {
+    color: var(--text-a);
+    font-weight: 600;
+}
+.ev-time {
+    color: var(--text-b);
+}
+.ev-details {
+    font-size: 12px;
+    color: var(--text-c);
+    display: flex;
+    gap: 16px;
+}
+.ev-details span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ── RISK GLOWS (Dynamic Classes) ─────────────────────────────*/
+.bento-box.risk-critical { border-color: rgba(255,0,0,0.4); box-shadow: 0 0 20px rgba(255,0,0,0.1), var(--glass-shadow); }
+.bento-box.risk-high     { border-color: rgba(255,68,68,0.4); box-shadow: 0 0 20px rgba(255,68,68,0.1), var(--glass-shadow); }
+.bento-box.risk-warning  { border-color: rgba(255,140,0,0.4); box-shadow: 0 0 20px rgba(255,140,0,0.1), var(--glass-shadow); }
+
+.alert-value.risk-critical { color: var(--c-critical); border-color: var(--c-critical); text-shadow: 0 0 10px var(--c-critical); }
+.alert-value.risk-high     { color: var(--c-high); border-color: var(--c-high); text-shadow: 0 0 10px var(--c-high); }
+.alert-value.risk-warning  { color: var(--c-warning); border-color: var(--c-warning); text-shadow: 0 0 10px var(--c-warning); }
+.alert-value.risk-nominal  { color: var(--c-safe); border-color: var(--c-safe); text-shadow: 0 0 10px var(--c-safe); }
+
+/* ── LOADING SEQUENCE (HOLOGRAM OVERLAY) ──────────────────────*/
+.hologram-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(4, 4, 15, 0.85);
+    backdrop-filter: blur(10px);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.hologram-overlay.hidden {
+    display: none;
+}
+
+.loader-content {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+
+.loader-circle {
+    width: 80px;
+    height: 80px;
+    border: 2px solid transparent;
+    border-top-color: var(--c-cyan);
+    border-bottom-color: var(--c-purple);
+    border-radius: 50%;
+    animation: spinSlow 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+    position: relative;
+}
+.loader-circle::before {
+    content: '';
+    position: absolute;
+    top: 8px; left: 8px; right: 8px; bottom: 8px;
+    border: 2px dashed rgba(0,212,255,0.4);
+    border-radius: 50%;
+    animation: spinSlow 2s linear infinite reverse;
+}
+.loader-circle::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px; height: 20px;
+    background: var(--c-cyan);
+    border-radius: 50%;
+    box-shadow: 0 0 20px var(--c-cyan);
+    animation: pulse 1s ease-in-out infinite alternate;
+}
+
+.loader-text-wrapper {
+    text-align: center;
+    width: 100%;
+}
+.loader-title {
+    font-family: var(--f-head);
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: var(--text-a);
+    margin-bottom: 8px;
+    text-shadow: 0 0 10px rgba(0,212,255,0.5);
+}
+.loader-subtitle {
+    font-family: var(--f-mono);
+    font-size: 12px;
+    color: var(--c-cyan);
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+.loader-progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+.loader-progress-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--c-purple), var(--c-cyan));
+    box-shadow: 0 0 10px var(--c-cyan);
+}
+
+.binary-stream {
+    font-family: var(--f-mono);
+    font-size: 10px;
+    color: rgba(0,212,255,0.2);
+    width: 100%;
+    height: 60px;
+    overflow: hidden;
+    line-height: 1.2;
+    text-align: center;
+    mask-image: linear-gradient(180deg, transparent, #000 50%, transparent);
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 50%, transparent);
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+    100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+}
+
+/* ── PRINT MEDIA QUERY ────────────────────────────────────────*/
 @media print {
-  .topbar, .ai_assistant-fab, .report-download-btn { display: none !important; }
-  html, body { background: #ffffff !important; }
-  .report-shell { max-width: 100%; padding: 0 12px; }
-  .report-header { position: static; box-shadow: none; }
-  .card { box-shadow: none; border: 1px solid #e4e7e0; }
-  .report-section { break-inside: avoid; }
+    body { background: #fff !important; color: #000 !important; }
+    .sidebar, .page-header, .btn, .hologram-overlay { display: none !important; }
+    .report-wrapper { padding: 0; overflow: visible; }
+    .bento-grid { display: block; max-height: none; }
+    .bento-box {
+        break-inside: avoid;
+        margin-bottom: 20px;
+        background: none;
+        border: 1px solid #ccc;
+        box-shadow: none;
+        color: #000;
+    }
+    .sl-line { background: #ccc; }
+    .sl-text, .alert-label, .sensor-label, .tl-time { color: #555; }
+    .zone-primary h2, .score-number, .sensor-value { color: #000; text-shadow: none; }
+    .timeline-container::before { background: #ccc; }
+    .timeline-node::before { background: #555; box-shadow: none; }
+    .compound-list li, .recs-list li, .ev-item {
+        background: #f9f9f9;
+        border: 1px solid #eee;
+        border-left: 3px solid #555;
+        color: #000;
+    }
 }

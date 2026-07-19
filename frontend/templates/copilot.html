@@ -1,49 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SENTINEL — Copilot</title>
-  <link rel="stylesheet" href="../static/css/sentinel.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENTINEL | Neural Copilot</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Styles -->
+    <link rel="stylesheet" href="../static/css/sentinel.css">
+    <link rel="stylesheet" href="../static/css/copilot.css">
 </head>
-<body>
+<body class="sentinel-body">
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar__brand">SENTINEL</div>
+            <nav class="sidebar__nav">
+                <a class="sidebar__link" href="/index.html">📊 Dashboard</a>
+                <a class="sidebar__link" href="/heatmap.html">🗺️ Heatmap</a>
+                <a class="sidebar__link" href="/replay.html">⏮️ Replay</a>
+                <a class="sidebar__link" href="/permits.html">📋 Permits</a>
+                <a class="sidebar__link" href="/workers.html">👷 Workers</a>
+                <a class="sidebar__link is-active" href="/copilot.html">💬 Copilot</a>
+                <a class="sidebar__link" href="/report.html">📄 Reports</a>
+            </nav>
+            <div class="sidebar__footer">SYSTEM ONLINE</div>
+        </aside>
 
-  <div class="app-shell">
-    
-    <aside class="sidebar">
-      <div class="sidebar__brand">🛡️ SENTINEL</div>
-      <nav class="sidebar__nav">
-        <a class="sidebar__link" href="/index.html">📊 Dashboard</a>
-        <a class="sidebar__link" href="/heatmap.html">🗺️ Heatmap</a>
-        <a class="sidebar__link" href="/replay.html">⏮️ Replay</a>
-        <a class="sidebar__link" href="/permits.html">📋 Permits</a>
-        <a class="sidebar__link" href="/workers.html">👷 Workers</a>
-        <a class="sidebar__link is-active" href="/copilot.html">💬 Copilot</a>
-        <a class="sidebar__link" href="/report.html">📄 Reports</a>
-      </nav>
-    </aside>
+        <!-- Main Content -->
+        <main class="main-content layout-copilot">
+            <header class="top-bar">
+                <div class="header-glitch">
+                    <h2>NEURAL CORE COPILOT</h2>
+                    <div class="subtitle">ADVANCED SAFETY INTELLIGENCE TERMINAL</div>
+                </div>
+            </header>
 
-    <main class="main-content">
-      <div class="mono" style="display:flex; justify-content:space-between; color:var(--text-secondary);">
-        <span>SENTINEL — RAG Assistant</span>
-        <span class="color-normal">Online</span>
-      </div>
+            <div class="copilot-container">
+                <!-- Left Panel: System Telemetry -->
+                <aside class="telemetry-panel glass-panel">
+                    <div class="telemetry-header">
+                        <span class="pulse-dot"></span>
+                        <h3>SYSTEM TELEMETRY</h3>
+                    </div>
+                    
+                    <div class="panel-section">
+                        <label for="zone-selector" class="telemetry-label">ACTIVE SECTOR</label>
+                        <div class="select-wrapper">
+                            <select id="zone-selector" class="sentinel-select">
+                                <option value="ALL">ALL SECTORS (GLOBAL)</option>
+                                <!-- Populated by JS -->
+                            </select>
+                        </div>
+                    </div>
 
-      <div class="ascii-box" style="flex:1; display:flex; flex-direction:column;">
-        <div style="margin-bottom: 16px; border-bottom:1px solid var(--border); padding-bottom:8px;">TERMINAL INTERFACE</div>
-        
-        <div id="chatWindow" style="flex:1; overflow-y:auto; font-family:var(--font-mono); font-size:14px; margin-bottom:16px;">
-          <div style="color:var(--text-secondary); margin-bottom:12px;">> SYSTEM: RAG Pipeline initialized. How can I help you analyze the plant data?</div>
-        </div>
+                    <div class="panel-section" id="zone-risk-summary">
+                        <label class="telemetry-label">THREAT LEVEL</label>
+                        <div class="risk-display">
+                            <div class="risk-score-wrapper">
+                                <span class="risk-score" id="context-risk-score">--</span>
+                                <span class="risk-percent">%</span>
+                            </div>
+                            <div class="risk-chart-container">
+                                <canvas id="risk-trend-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
 
-        <div style="display:flex; gap:12px; border-top:1px dashed var(--border); padding-top:16px;">
-          <input type="text" id="chatInput" placeholder="Ask about safety protocols or current risks..." style="flex:1; background:var(--bg-sunken); border:1px solid var(--border); color:var(--text); padding:8px 12px; font-family:var(--font-mono);" />
-          <button id="chatBtn">SEND</button>
-        </div>
-      </div>
-    </main>
-  </div>
+                    <div class="panel-section">
+                        <label class="telemetry-label">ENVIRONMENTAL (GAS PPM)</label>
+                        <div class="gas-display">
+                            <div class="gas-value" id="context-gas-ppm">--</div>
+                            <div class="gas-bar-container">
+                                <div class="gas-bar-fill" id="gas-bar-fill"></div>
+                            </div>
+                        </div>
+                    </div>
 
-  <script src="../static/js/copilot.js"></script>
+                    <div class="panel-section quick-actions">
+                        <label class="telemetry-label">DIRECTIVES</label>
+                        <div class="quick-chips">
+                            <button class="quick-btn" data-q="Provide a comprehensive risk analysis of the current sector.">Risk Analysis</button>
+                            <button class="quick-btn" data-q="List all active permits and associated hazards.">Active Permits</button>
+                            <button class="quick-btn" data-q="Detect any environmental anomalies.">Env Anomalies</button>
+                            <button class="quick-btn" data-q="Summarize latest safety protocols.">Safety Protocols</button>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Right Panel: Neural Terminal -->
+                <section class="terminal-panel glass-panel">
+                    <div class="terminal-header">
+                        <div class="terminal-title">
+                            <span class="icon-terminal">></span>
+                            <span>SECURE CHANNEL ACTIVE</span>
+                        </div>
+                        <div class="terminal-status">ENCRYPTED</div>
+                    </div>
+
+                    <div class="chat-messages" id="chat-messages">
+                        <!-- Messages will be appended here -->
+                        <div class="message ai-message welcome" style="opacity: 1;">
+                            <div class="message-border"></div>
+                            <div class="message-content">
+                                <div class="message-meta">SYSTEM [SENTINEL AI]</div>
+                                <div class="msg-text">Neural Core initialized. Waiting for operator input...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="terminal-input-area">
+                        <div class="input-glow-wrapper">
+                            <div class="prompt-symbol">></div>
+                            <textarea id="chat-input" placeholder="Enter query..." rows="1"></textarea>
+                            <button id="btn-send" class="btn-terminal">
+                                <span class="btn-text">EXECUTE</span>
+                                <span class="btn-scanline"></span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/copilot.js"></script>
 </body>
 </html>

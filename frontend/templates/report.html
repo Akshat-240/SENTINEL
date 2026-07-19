@@ -1,61 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SENTINEL — Report</title>
-  <link rel="stylesheet" href="../static/css/sentinel.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENTINEL - Reports</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/sentinel.css">
+    <link rel="stylesheet" href="../static/css/report.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
-<body>
+<body class="sentinel-body">
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar__brand">SENTINEL</div>
+            <nav class="sidebar__nav">
+                <a class="sidebar__link" href="/index.html">📊 Dashboard</a>
+                <a class="sidebar__link" href="/heatmap.html">🗺️ Heatmap</a>
+                <a class="sidebar__link" href="/replay.html">⏮️ Replay</a>
+                <a class="sidebar__link" href="/permits.html">📋 Permits</a>
+                <a class="sidebar__link" href="/workers.html">👷 Workers</a>
+                <a class="sidebar__link" href="/copilot.html">💬 Copilot</a>
+                <a class="sidebar__link is-active" href="/report.html">📄 Reports</a>
+            </nav>
+            <div class="sidebar__footer">SYSTEM ONLINE</div>
+        </aside>
 
-  <div class="app-shell">
-    
-    <aside class="sidebar">
-      <div class="sidebar__brand">🛡️ SENTINEL</div>
-      <nav class="sidebar__nav">
-        <a class="sidebar__link" href="/index.html">📊 Dashboard</a>
-        <a class="sidebar__link" href="/heatmap.html">🗺️ Heatmap</a>
-        <a class="sidebar__link" href="/replay.html">⏮️ Replay</a>
-        <a class="sidebar__link" href="/permits.html">📋 Permits</a>
-        <a class="sidebar__link" href="/workers.html">👷 Workers</a>
-        <a class="sidebar__link" href="/copilot.html">💬 Copilot</a>
-        <a class="sidebar__link is-active" href="/report.html">📄 Reports</a>
-      </nav>
-    </aside>
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <div>
+                    <div class="ph-title">
+                        <div class="ph-title-text">MISSION REPORT</div>
+                    </div>
+                    <p class="ph-subtitle">INTELLIGENCE & ANALYSIS DOCUMENTATION</p>
+                </div>
+                
+                <div class="controls-bar">
+                    <div class="control-group">
+                        <label for="report-zone-select" class="mono">TARGET ZONE</label>
+                        <select id="report-zone-select" class="sentinel-select">
+                            <option value="">INITIALIZING...</option>
+                        </select>
+                    </div>
+                    <button id="btn-generate" class="btn btn-primary">
+                        <span>INITIATE SCAN</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    </button>
+                </div>
+            </header>
 
-    <main class="main-content">
-      <div class="mono" style="display:flex; justify-content:space-between; color:var(--text-secondary);">
-        <span>SENTINEL — Incident Report Generator</span>
-        <span class="color-normal">Ready</span>
-      </div>
+            <div class="report-wrapper">
+                <!-- Loading Sequence Overlay -->
+                <div id="loading-sequence" class="hologram-overlay hidden">
+                    <div class="loader-content">
+                        <div class="loader-circle"></div>
+                        <div class="loader-text-wrapper">
+                            <h2 class="loader-title">COMPILING REPORT</h2>
+                            <p class="loader-subtitle" id="loader-status">ESTABLISHING UPLINK...</p>
+                            <div class="loader-progress-bar">
+                                <div class="loader-progress-fill" id="loader-progress"></div>
+                            </div>
+                        </div>
+                        <div class="binary-stream" id="binary-stream"></div>
+                    </div>
+                </div>
 
-      <div class="grid-2" style="flex:1;">
-        <!-- Generator Controls -->
-        <div class="ascii-box">
-          <div style="margin-bottom: 16px; border-bottom:1px solid var(--border); padding-bottom:8px;">GENERATE REPORT</div>
-          
-          <div style="margin-bottom: 16px;">
-            <label style="display:block; margin-bottom:8px; font-family:var(--font-mono); color:var(--text-secondary);">Select Zone ID:</label>
-            <select id="zoneSelect" style="width:100%; padding:8px; background:var(--bg-sunken); border:1px solid var(--border); color:var(--text); font-family:var(--font-mono);">
-              <!-- Populated dynamically by report.js -->
-            </select>
-          </div>
-          
-          <button id="generateBtn" style="width:100%; padding:12px; font-weight:bold; background:var(--border-strong);">RUN GENERATOR (10s)</button>
-        </div>
+                <!-- Report Output - Bento Box Grid -->
+                <div id="report-bento" class="bento-grid hidden">
+                    
+                    <!-- Overview Box -->
+                    <div class="bento-box bento-overview" id="b-overview">
+                        <div class="bento-header">
+                            <div class="sl-line"></div>
+                            <span class="sl-text">ZONE OVERVIEW</span>
+                        </div>
+                        <div class="overview-content">
+                            <div class="zone-primary">
+                                <h2 id="r-zone-name">--</h2>
+                                <p class="mono text-muted">ID: <span id="r-zone-id">--</span></p>
+                            </div>
+                            <div class="alert-status">
+                                <div class="alert-label">STATUS</div>
+                                <div class="alert-value" id="r-alert-level">--</div>
+                            </div>
+                        </div>
+                        <div class="sensor-snapshot">
+                            <div class="sensor-metric">
+                                <div class="sensor-label">GAS (PPM)</div>
+                                <div class="sensor-value" id="r-gas">--</div>
+                            </div>
+                            <div class="sensor-metric">
+                                <div class="sensor-label">TEMP (°C)</div>
+                                <div class="sensor-value" id="r-temp">--</div>
+                            </div>
+                            <div class="sensor-metric">
+                                <div class="sensor-label">WORKERS</div>
+                                <div class="sensor-value" id="r-workers">--</div>
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- Output View -->
-        <div class="ascii-box" style="display:flex; flex-direction:column;">
-          <div style="margin-bottom: 16px; border-bottom:1px solid var(--border); padding-bottom:8px;">REPORT OUTPUT</div>
-          
-          <div id="reportOutput" style="flex:1; overflow-y:auto; font-family:var(--font-mono); font-size:13px; color:var(--text-muted); white-space:pre-wrap;">
-            Select a zone and click Generate to produce an incident report.
-          </div>
-        </div>
-      </div>
-    </main>
-  </div>
+                    <!-- Risk Score Box -->
+                    <div class="bento-box bento-score" id="b-score">
+                        <div class="bento-header">
+                            <div class="sl-line"></div>
+                            <span class="sl-text">RISK INDEX</span>
+                        </div>
+                        <div class="score-display">
+                            <div class="chart-wrapper">
+                                <canvas id="scoreChart"></canvas>
+                            </div>
+                            <div class="score-number" id="r-score">--</div>
+                        </div>
+                    </div>
 
-  <script src="../static/js/report.js"></script>
+                    <!-- Risk Factors Box -->
+                    <div class="bento-box bento-factors" id="b-factors">
+                        <div class="bento-header">
+                            <div class="sl-line"></div>
+                            <span class="sl-text">THREAT VECTORS</span>
+                        </div>
+                        <div class="factors-list" id="r-risk-factors">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Compound Risks Box -->
+                    <div class="bento-box bento-compound" id="b-compound">
+                        <div class="bento-header">
+                            <div class="sl-line"></div>
+                            <span class="sl-text">COMPOUND ANOMALIES</span>
+                        </div>
+                        <ul class="compound-list" id="r-compound-risks">
+                            <!-- Populated by JS -->
+                        </ul>
+                    </div>
+
+                    <!-- Timeline Box -->
+                    <div class="bento-box bento-timeline" id="b-timeline">
+                        <div class="bento-header">
+                            <div class="sl-line"></div>
+                            <span class="sl-text">EVENT TIMELINE</span>
+                        </div>
+                        <div class="timeline-container" id="r-timeline">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Evidence Log Box -->
+                    <div class="bento-box bento-evidence" id="b-evidence">
+                        <div class="bento-header">
+                            <div class="sl-line"></div>
+                            <span class="sl-text">EVIDENCE LOG</span>
+                        </div>
+                        <div class="evidence-list" id="evidence-log">
+                            <div class="loading-state">AWAITING ZONE SELECTION...</div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendations Box -->
+                    <div class="bento-box bento-recs" id="b-recs">
+                        <div class="bento-header">
+                            <div class="sl-line"></div>
+                            <span class="sl-text">ACTIONABLE INTEL</span>
+                        </div>
+                        <ul class="recs-list" id="r-recommendations">
+                            <!-- Populated by JS -->
+                        </ul>
+                    </div>
+
+                    <!-- Actions Box -->
+                    <div class="bento-box bento-actions" id="b-actions">
+                         <button class="btn btn-ghost" id="btn-print" onclick="window.print()" style="width: 100%; justify-content: center; padding: 12px;">
+                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                             PRINT / EXPORT
+                         </button>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="/static/js/report.js"></script>
 </body>
 </html>

@@ -1,234 +1,261 @@
-/* ==========================================================================
-   SENTINEL — heatmap.css
-   Page-specific additions for heatmap.html. Reuses all tokens from
-   sentinel.css v2 (colors, radii, shadows, type) — no new visual language.
-   ========================================================================== */
+/* ============================================================
+   SENTINEL — ISOMETRIC HEATMAP CSS
+   ============================================================ */
 
-.heatmap-shell {
-  display: flex; flex-direction: column; gap: 16px;
-  max-width: 1400px; margin: 0 auto; padding: 28px 22px 100px;
-}
-
-/* ---------- Mode bar ---------- */
-/* No card/rectangle here on purpose — this is just a status line, not a
-   panel, so it sits flush against the page background. */
-.mode-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 4px 2px;
-  background: none;
-  box-shadow: none;
-}
-
-.mode-bar__status { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
-.mode-bar__status .pill__dot { animation: modePulse 1.8s var(--ease) infinite; }
-.mode-bar.is-historical .mode-bar__status .pill__dot { animation: none; }
-@keyframes modePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-
-.mode-bar__label--live { color: var(--risk-normal); }
-.mode-bar__label--historical { color: var(--text-secondary); }
-
-.mode-bar__return {
-  font-size: 12px; font-weight: 600; color: var(--text);
-  background: var(--bg-sunken); padding: 7px 14px; border-radius: var(--radius-pill);
-  transition: background var(--dur-fast) var(--ease);
-}
-.mode-bar__return:hover { background: var(--border-strong); }
-
-.scrubber__return-row {
+/* ── HEADER KPI MINI ─────────────────────────────────────────*/
+.page-header {
   display: flex;
-  justify-content: flex-end;
-  margin-top: 12px;
-}
-
-/* ---------- Map card ---------- */
-.map-card { padding: 0; overflow: hidden; position: relative; z-index: 1; }
-.map-card__surface { width: 100%; height: 520px; }
-@media (max-width: 720px) { .map-card__surface { height: 380px; } }
-
-.leaflet-popup-content-wrapper { border-radius: var(--radius-sm); box-shadow: var(--shadow-elevated); }
-.leaflet-container { font-family: var(--font-body); background: var(--bg-sunken); }
-
-/* Theme the built-in Leaflet zoom control so it matches the app instead of
-   Leaflet's default white-on-white styling (which is nearly invisible in
-   Night mode). */
-.leaflet-control-zoom {
-  border: none !important;
-  box-shadow: var(--shadow-card);
-  border-radius: var(--radius-sm) !important;
-  overflow: hidden;
-}
-.leaflet-control-zoom a {
-  background: var(--bg-elevated) !important;
-  color: var(--text) !important;
-  border-color: var(--border) !important;
-}
-.leaflet-control-zoom a:hover { background: var(--bg-sunken) !important; }
-
-/* Floating "Recenter" button — appears only once the user has panned or
-   zoomed away from the plant's default view (see heatmap.js). */
-.map-recenter-btn {
-  position: absolute;
-  bottom: 14px;
-  left: 14px;
-  z-index: 400; /* above Leaflet's own panes/controls */
-  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  background: var(--bg-elevated);
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 600;
-  border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-elevated);
-  transition: transform var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
-}
-.map-recenter-btn:hover {
-  background: var(--bg-sunken);
-  transform: translateY(-1px);
+  padding: 16px 24px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-panel);
+  z-index: 20;
 }
 
-html[data-theme="night"] .leaflet-tile-pane {
-  filter: brightness(0.72) contrast(1.06) saturate(0.82);
-  transition: filter var(--dur-med) var(--ease);
-}
-
-.zone-label {
-  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
-  padding: 3px 8px; border-radius: var(--radius-pill);
-  background: var(--pill-bg, var(--risk-normal-tint));
-  color: var(--pill-fg, var(--risk-normal));
-  white-space: nowrap; box-shadow: var(--shadow-card);
-}
-
-.map-dot { border-radius: 50%; border: 2px solid var(--bg-elevated); box-shadow: var(--shadow-card); }
-.map-square { border-radius: 3px; border: 2px solid var(--bg-elevated); box-shadow: var(--shadow-card); opacity: 0.85; }
-
-/* ---------- Scrubber (Historical mode only) ---------- */
-.scrubber-card { display: none; }
-.mode-bar.is-historical ~ .scrubber-card { display: block; }
-
-.scrubber__row { display: flex; align-items: center; gap: 14px; }
-.scrubber__play {
-  flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%;
-  background: var(--n-800); color: var(--n-50);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700;
-  transition: transform var(--dur-fast) var(--ease);
-}
-[data-theme="night"] .scrubber__play { background: var(--n-50); color: var(--n-800); }
-.scrubber__play:hover { transform: scale(1.06); }
-
-.scrubber__track { flex: 1; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px; background: var(--border-strong); }
-.scrubber__track::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
-  background: var(--n-800); cursor: pointer; box-shadow: var(--shadow-card);
-}
-[data-theme="night"] .scrubber__track::-webkit-slider-thumb { background: var(--n-50); }
-
-.scrubber__time { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); flex-shrink: 0; width: 64px; text-align: right; }
-
-/* ---------- Detail panel ---------- */
-/* Overrides .card here so the outer wrapper doesn't draw its own
-   background/shadow "box" around the already-boxed .zone-detail-card list
-   inside it — avoids the doubled-rectangle look. */
-.detail-panel {
-  background: none;
-  box-shadow: none;
-  padding: 0;
-}
-.detail-panel__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-.detail-panel__title { font-size: 14px; font-weight: 600; }
-.detail-panel__subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; display: block; margin-bottom: 14px; }
-
-/* ---------- Notification panel (top-right) ---------- */
-.notif-panel { position: fixed; top: 84px; right: 22px; z-index: 500; width: 300px; }
-
-.notif-panel__collapsed {
-  display: flex; align-items: center; gap: 10px;
-  width: 100%;
-  background: var(--pill-bg, var(--bg-elevated));
-  color: var(--pill-fg, var(--text));
-  border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-elevated);
-  padding: 10px 16px;
-  cursor: pointer;
-  transition: transform var(--dur-fast) var(--ease);
-}
-.notif-panel__collapsed:hover { transform: translateY(1px); }
-.notif-panel__collapsed-text {
-  flex: 1;
-  display: flex; align-items: center; gap: 8px;
-  font-size: 12px; font-weight: 600; color: inherit; line-height: 1.3;
-}
-.notif-panel__expand-hint { font-size: 11px; font-weight: 600; color: inherit; opacity: 0.7; flex-shrink: 0; }
-
-.notif-panel__list {
-  display: none; margin-top: 8px; max-height: 320px; overflow-y: auto;
-  background: var(--bg-elevated); border-radius: var(--radius-card); box-shadow: var(--shadow-elevated);
-  padding: 6px;
-}
-.notif-panel.is-open .notif-panel__list { display: block; }
-.notif-panel.is-open .notif-panel__collapsed { display: none; }
-
-.notif-panel__close-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px 10px; }
-.notif-panel__title { font-size: 12px; font-weight: 600; color: var(--text-muted); }
-.notif-panel__close { font-size: 11px; font-weight: 600; color: var(--text-muted); }
-.notif-panel__close:hover { color: var(--text); }
-
-.notif-row {
-  display: flex; flex-direction: column; gap: 3px;
-  padding: 10px 10px; border-radius: var(--radius-sm); cursor: pointer;
-  border-left: 3px solid var(--pill-fg, var(--text-muted));
-  background: var(--pill-bg, transparent);
-  margin-bottom: 6px;
-  transition: opacity var(--dur-fast) var(--ease);
-}
-.notif-row:last-child { margin-bottom: 0; }
-.notif-row.is-read { opacity: 0.5; }
-.notif-row__time {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--pill-fg, var(--text-muted));
-  opacity: 0.65;
-}
-.notif-row__text { font-size: 12px; font-weight: 600; color: var(--pill-fg, var(--text)); }
-
-/* ---------- Zone Detail cards (stacked, one per zone) ---------- */
-.zone-detail-list {
+.hm-kpi-mini {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  align-items: center;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: var(--r-sm);
+  padding: 4px 12px;
+  min-width: 70px;
+}
+.hkm-val {
+  font-family: var(--f-mono);
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--text-a);
+  line-height: 1.2;
+}
+.hkm-lbl {
+  font-size: 9px;
+  color: var(--text-b);
+  letter-spacing: 1px;
 }
 
-.zone-detail-card {
-  background: var(--bg-elevated);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-card);
+/* ── LAYOUT ──────────────────────────────────────────────────*/
+.heatmap-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+/* ── 3D CANVAS WRAPPER ───────────────────────────────────────*/
+.canvas-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-void);
+}
+#factory-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── FLOATING LABELS ─────────────────────────────────────────*/
+.zone-label-3d {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: rgba(4, 4, 16, 0.7);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+  pointer-events: none;
+  z-index: 5;
+  transition: opacity 0.2s;
+}
+.zl-name {
+  font-family: var(--f-head);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-a);
+  white-space: nowrap;
+}
+.zl-score {
+  font-family: var(--f-mono);
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* ── INFO OVERLAY (Bottom Left) ──────────────────────────────*/
+.info-overlay {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  width: 320px;
+  background: rgba(10, 15, 35, 0.85);
+  border-radius: var(--r-md);
+  padding: 20px;
+  z-index: 10;
+  transition: opacity 0.3s, transform 0.3s;
+}
+.info-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+}
+.overlay-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  position: relative;
+}
+.overlay-close {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-b);
+  font-size: 14px;
+  padding: 4px;
+}
+.overlay-close:hover { color: var(--text-a); }
+
+/* ── LEGEND (Top Right) ──────────────────────────────────────*/
+.legend-panel {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: rgba(10, 15, 35, 0.85);
   padding: 16px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-radius: var(--r-md);
+}
+.legend-title {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-b);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 8px;
+  margin-bottom: 4px;
+}
+.legend-gradient {
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(90deg, #00ff88, #ffd700, #ff8c00, #ff4444, #ff0000);
+  border-radius: 2px;
+  margin-bottom: 8px;
+}
+.legend-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  color: var(--text-a);
+}
+
+/* ── SIDE PANEL (Right 25%) ──────────────────────────────────*/
+.zone-list-panel {
+  width: 320px;
+  background: var(--bg-panel);
+  border-left: 1px solid var(--border-panel);
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+}
+.panel-label {
+  padding: 16px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--c-cyan);
+  border-bottom: 1px solid var(--border-panel);
+}
+.zone-list-inner {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.zone-item {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--border-card);
+  border-left: 4px solid var(--c-safe);
+  border-radius: var(--r-sm);
+  padding: 12px;
   cursor: pointer;
-  border: 1px solid var(--border-strong);
-  border-left: 4px solid var(--card-accent);
-  transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+  transition: all var(--t-fast);
+}
+.zone-item:hover, .zone-item.selected {
+  background: rgba(255,255,255,0.05);
+  border-right-color: rgba(255,255,255,0.2);
+  border-top-color: rgba(255,255,255,0.2);
+  border-bottom-color: rgba(255,255,255,0.2);
+}
+.zi-row1, .zi-row2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.zi-name { font-family: var(--f-head); font-size: 15px; font-weight: 600; }
+.zi-score { font-family: var(--f-mono); font-size: 16px; font-weight: bold; }
+.zi-tag {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  border: 1px solid;
+}
+.zi-workers { font-size: 11px; color: var(--text-b); }
+.zi-bar-track {
+  height: 4px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.zi-bar-fill {
+  height: 100%;
+  border-radius: 2px;
 }
 
-.zone-detail-card:hover {
-  box-shadow: var(--shadow-elevated);
-  transform: translateY(-1px);
+/* ── TREND STRIP (Bottom) ────────────────────────────────────*/
+.trend-strip {
+  height: 90px;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border-panel);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 20px;
+  overflow-x: auto;
+  z-index: 20;
 }
-
-.zone-detail-card:focus-visible {
-  outline: 2px solid var(--card-accent);
-  outline-offset: 2px;
-  box-shadow: var(--shadow-elevated);
+.trend-item {
+  min-width: 140px;
+  height: 60px;
+  display: flex;
+  flex-direction: column;
 }
-
-.zone-detail-card.is-selected {
-  border-color: var(--card-accent);
-  box-shadow: var(--shadow-elevated);
+.trend-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
 }
-.zone-detail-card:focus-visible {
-  outline: 2px solid var(--card-accent);
-  outline-offset: 2px;
-  box-shadow: var(--shadow-elevated);
+.trend-chart-container {
+  flex: 1;
+  position: relative;
 }

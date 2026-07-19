@@ -1,44 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SENTINEL — Permits</title>
-  <link rel="stylesheet" href="../static/css/sentinel.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENTINEL | Permits</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/sentinel.css">
+    <link rel="stylesheet" href="../static/css/permits.css">
 </head>
-<body>
+<body class="sentinel-body">
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar__brand">SENTINEL</div>
+            <nav class="sidebar__nav">
+                <a class="sidebar__link" href="/index.html">📊 Dashboard</a>
+                <a class="sidebar__link" href="/heatmap.html">🗺️ Heatmap</a>
+                <a class="sidebar__link" href="/replay.html">⏮️ Replay</a>
+                <a class="sidebar__link is-active" href="/permits.html">📋 Permits</a>
+                <a class="sidebar__link" href="/workers.html">👷 Workers</a>
+                <a class="sidebar__link" href="/copilot.html">💬 Copilot</a>
+                <a class="sidebar__link" href="/report.html">📄 Reports</a>
+            </nav>
+            <div class="sidebar__footer">SYSTEM ONLINE</div>
+        </aside>
 
-  <div class="app-shell">
-    
-    <aside class="sidebar">
-      <div class="sidebar__brand">🛡️ SENTINEL</div>
-      <nav class="sidebar__nav">
-        <a class="sidebar__link" href="/index.html">📊 Dashboard</a>
-        <a class="sidebar__link" href="/heatmap.html">🗺️ Heatmap</a>
-        <a class="sidebar__link" href="/replay.html">⏮️ Replay</a>
-        <a class="sidebar__link is-active" href="/permits.html">📋 Permits</a>
-        <a class="sidebar__link" href="/workers.html">👷 Workers</a>
-        <a class="sidebar__link" href="/copilot.html">💬 Copilot</a>
-        <a class="sidebar__link" href="/report.html">📄 Reports</a>
-      </nav>
-    </aside>
+        <!-- Main Content -->
+        <main class="main-content clearance-terminal">
+            <header class="terminal-header">
+                <div class="terminal-title">
+                    <h1 class="glitch" data-text="ACCESS CONTROL & CLEARANCE">ACCESS CONTROL & CLEARANCE</h1>
+                    <span class="subtitle">SYS.AUTH.TERMINAL v9.0</span>
+                </div>
+                <div class="terminal-controls">
+                    <label for="permits-zone-select" class="zone-label">SECURE ZONE</label>
+                    <select id="permits-zone-select" class="zone-select cyber-input">
+                        <option value="">AWAITING SELECTION...</option>
+                    </select>
+                </div>
+            </header>
 
-    <main class="main-content">
-      <div class="mono" style="display:flex; justify-content:space-between; color:var(--text-secondary);">
-        <span>SENTINEL — Permit Intelligence</span>
-        <span class="color-normal" id="permitCount">Live Tracking</span>
-      </div>
+            <div class="terminal-grid">
+                <!-- Top Left: Risk Gauge -->
+                <div class="terminal-panel gauge-panel">
+                    <div class="panel-header">
+                        <span class="icon">⚠️</span>
+                        <h2>ZONE THREAT ASSESSMENT</h2>
+                    </div>
+                    <div class="gauge-container">
+                        <svg class="pulse-ring" viewBox="0 0 100 100">
+                             <circle cx="50" cy="50" r="45"></circle>
+                        </svg>
+                        <canvas id="risk-gauge-canvas"></canvas>
+                        <div class="gauge-overlay">
+                            <div id="gauge-score" class="gauge-score">--</div>
+                            <div id="gauge-status" class="gauge-status">AWAITING</div>
+                        </div>
+                    </div>
+                    <div class="gauge-footer">
+                        <span>SYS.SCAN.ACTIVE</span>
+                        <div class="scanning-bar"></div>
+                    </div>
+                </div>
 
-      <div class="ascii-box" style="flex:1;">
-        <div style="margin-bottom: 16px; border-bottom:1px solid var(--border); padding-bottom:8px;">ACTIVE WORK PERMITS</div>
-        <div id="permitsList" class="loading-overlay">
-          <div class="spinner"></div> Loading permits...
-        </div>
-      </div>
-    </main>
-  </div>
+                <!-- Top Right: Compliance -->
+                <div class="terminal-panel compliance-panel">
+                    <div class="panel-header">
+                        <span class="icon">🛡️</span>
+                        <h2>SECURITY COMPLIANCE</h2>
+                    </div>
+                    <div id="compliance-status-panel" class="compliance-list cyber-list">
+                        <!-- JS injected -->
+                    </div>
+                </div>
 
-  <script src="../static/js/data.js"></script>
-  <script src="../static/js/permits.js"></script>
+                <!-- Bottom Left: Check Permit -->
+                <div class="terminal-panel checker-panel">
+                    <div class="panel-header">
+                        <span class="icon">🔐</span>
+                        <h2>AUTH CLEARANCE REQUEST</h2>
+                    </div>
+                    <form id="permit-checker-form" class="cyber-form">
+                        <div class="form-group">
+                            <label for="permit-type-input">AUTHORIZATION CODE</label>
+                            <input type="text" id="permit-type-input" class="cyber-input" placeholder="INPUT CLEARANCE CODE (e.g. HOT_WORK)" required>
+                            <div class="input-scanner"></div>
+                        </div>
+                        <button type="submit" id="btn-check-permit" class="cyber-button">
+                            <span class="button-text">REQUEST CLEARANCE</span>
+                            <span class="button-glitch"></span>
+                        </button>
+                    </form>
+                    
+                    <div id="permit-result" class="permit-result cyber-stamp-container hidden">
+                        <!-- JS injected stamped text -->
+                    </div>
+                </div>
+
+                <!-- Bottom Right: Active Permits -->
+                <div class="terminal-panel active-permits-panel">
+                    <div class="panel-header">
+                        <span class="icon">📋</span>
+                        <h2>ACTIVE CLEARANCES</h2>
+                    </div>
+                    <div class="cyber-table-container">
+                        <table class="cyber-table" id="active-permits-table">
+                            <thead>
+                                <tr>
+                                    <th>TYPE</th>
+                                    <th>ID / PERSONNEL</th>
+                                    <th>ISSUED</th>
+                                    <th>STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="active-permits-list">
+                                <!-- JS injected -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="screen-flash" class="screen-flash"></div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/permits.js"></script>
 </body>
 </html>

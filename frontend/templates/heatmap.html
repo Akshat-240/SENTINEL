@@ -1,58 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SENTINEL — Heatmap</title>
-  <link rel="stylesheet" href="../static/css/sentinel.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SENTINEL | 3D Isometric Heatmap</title>
+  <meta name="description" content="Real-time 3D isometric factory risk heatmap with live sensor data">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../static/css/sentinel.css">
+  <link rel="stylesheet" href="../static/css/heatmap.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
-<body>
+<body class="sentinel-body">
+<div class="app-shell">
 
-  <div class="app-shell">
-    
-    <!-- SIDEBAR NAVIGATION -->
-    <aside class="sidebar">
-      <div class="sidebar__brand">🛡️ SENTINEL</div>
-      <nav class="sidebar__nav">
-        <a class="sidebar__link" href="/index.html">📊 Dashboard</a>
-        <a class="sidebar__link is-active" href="/heatmap.html">🗺️ Heatmap</a>
-        <a class="sidebar__link" href="/replay.html">⏮️ Replay</a>
-        <a class="sidebar__link" href="/permits.html">📋 Permits</a>
-        <a class="sidebar__link" href="/workers.html">👷 Workers</a>
-        <a class="sidebar__link" href="/copilot.html">💬 Copilot</a>
-        <a class="sidebar__link" href="/report.html">📄 Reports</a>
-      </nav>
-    </aside>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar__brand">SENTINEL</div>
+    <nav class="sidebar__nav">
+      <a class="sidebar__link" href="/index.html">📊 Dashboard</a>
+      <a class="sidebar__link is-active" href="/heatmap.html">🗺️ Heatmap</a>
+      <a class="sidebar__link" href="/replay.html">⏮️ Replay</a>
+      <a class="sidebar__link" href="/permits.html">📋 Permits</a>
+      <a class="sidebar__link" href="/workers.html">👷 Workers</a>
+      <a class="sidebar__link" href="/copilot.html">💬 Copilot</a>
+      <a class="sidebar__link" href="/report.html">📄 Reports</a>
+    </nav>
+    <div class="sidebar__footer">
+      <div style="color:var(--c-cyan); margin-bottom:4px;">● 3D HEATMAP</div>
+      <div>SENTINEL v3.0</div>
+    </div>
+  </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
-      <div class="mono" style="display:flex; justify-content:space-between; color:var(--text-secondary);">
-        <span>SENTINEL — Heatmap</span>
-        <span id="heatmapStatus" class="color-normal">Live Tracking</span>
+  <!-- MAIN -->
+  <main class="main-content" style="padding:0; overflow:hidden; display:flex; flex-direction:column;">
+
+    <!-- PAGE HEADER -->
+    <header class="page-header">
+      <div class="ph-title">
+        <span style="font-size:22px;">🏭</span>
+        <div>
+          <div class="ph-title-text">3D SPATIAL HEATMAP</div>
+          <div class="ph-subtitle">ISOMETRIC FACTORY RISK VISUALIZATION — LIVE</div>
+        </div>
       </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <label style="font-family:var(--f-mono);font-size:11px;color:var(--text-b);">FOCUS:</label>
+        <select id="zone-selector" class="sentinel-select" style="min-width:160px;"></select>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div class="hm-kpi-mini" id="hm-kpi-zones">
+          <div class="hkm-val" id="kpi-total">—</div>
+          <div class="hkm-lbl">ZONES</div>
+        </div>
+        <div class="hm-kpi-mini" id="hm-kpi-crit">
+          <div class="hkm-val" id="kpi-critical">—</div>
+          <div class="hkm-lbl">CRITICAL</div>
+        </div>
+        <div class="hm-kpi-mini" id="hm-kpi-work">
+          <div class="hkm-val" id="kpi-workers">—</div>
+          <div class="hkm-lbl">WORKERS</div>
+        </div>
+        <div class="hm-kpi-mini" id="hm-kpi-risk">
+          <div class="hkm-val" id="kpi-maxrisk">—</div>
+          <div class="hkm-lbl">MAX RISK</div>
+        </div>
+        <div class="ph-tag">LIVE 3D</div>
+      </div>
+    </header>
 
-      <div class="grid-2">
-        <!-- Floorplan Map -->
-        <div class="ascii-box" style="height: 500px; display:flex; flex-direction:column;">
-          <div style="margin-bottom: 16px; border-bottom:1px solid var(--border); padding-bottom:8px;">PLANT FLOORPLAN</div>
-          <div id="heatmapFloorplan" class="loading-overlay" style="flex:1; position:relative; overflow:hidden;">
-            <div class="spinner"></div>
+    <!-- HEATMAP LAYOUT -->
+    <div class="heatmap-body">
+
+      <!-- 3D CANVAS AREA -->
+      <div class="canvas-wrapper">
+        <canvas id="factory-canvas"></canvas>
+
+        <!-- ZONE LABELS injected here by JS -->
+
+        <!-- INFO OVERLAY -->
+        <div id="zone-info-overlay" class="info-overlay glass-panel hidden">
+          <div class="overlay-header">
+            <span class="overlay-zone-id" id="overlay-zone-id">ZONE</span>
+            <span class="overlay-name" id="overlay-zone-name">—</span>
+            <button class="overlay-close" onclick="document.getElementById('zone-info-overlay').classList.add('hidden')">✕</button>
+          </div>
+          <div class="overlay-stats">
+            <div class="stat-box"><div class="stat-label">RISK SCORE</div><div class="stat-value" id="overlay-score">—</div></div>
+            <div class="stat-box"><div class="stat-label">GAS PPM</div><div class="stat-value" id="overlay-gas">—</div></div>
+            <div class="stat-box"><div class="stat-label">TREND</div><div class="stat-value" id="overlay-trend">—</div></div>
+            <div class="stat-box"><div class="stat-label">CRITICAL IN</div><div class="stat-value" id="overlay-critical">—</div></div>
           </div>
         </div>
 
-        <!-- Disaster DNA Panel -->
-        <div class="ascii-box" style="height: 500px; display:flex; flex-direction:column;">
-          <div style="margin-bottom: 16px; border-bottom:1px solid var(--border); padding-bottom:8px;">DISASTER DNA</div>
-          <div id="disasterDna" style="flex:1; overflow-y:auto;">
-            <div class="loading-overlay" style="height:100%;">Select a zone to view Disaster DNA.</div>
+        <!-- LEGEND -->
+        <div class="legend-panel glass-panel">
+          <div class="legend-title">RISK SCALE</div>
+          <div class="legend-gradient"></div>
+          <div class="legend-items">
+            <div class="legend-item"><span class="legend-dot" style="background:#ff0000;"></span>CRITICAL &gt;85</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#ff4444;"></span>HIGH 76–85</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#ff8c00;"></span>WARNING 61–75</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#ffd700;"></span>CAUTION 41–60</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#00ff88;"></span>SAFE ≤40</div>
           </div>
+        </div>
+
+        <!-- CONTROLS HINT -->
+        <div class="controls-hint">
+          <span>🖱 Drag · Rotate</span>
+          <span>⚙ Scroll · Zoom</span>
+          <span>🎯 Click · Inspect</span>
         </div>
       </div>
 
-    </main>
-  </div>
+      <!-- SIDE PANEL -->
+      <aside class="zone-list-panel">
+        <div class="panel-label">ZONE STATUS</div>
+        <div id="zone-list" class="zone-list-inner">
+          <div class="loading-state"><div class="spinner"></div> Loading...</div>
+        </div>
+      </aside>
+    </div>
 
-  <script src="../static/js/data.js"></script>
-  <script src="../static/js/heatmap.js"></script>
+    <!-- TREND STRIP -->
+    <div id="trend-strip" class="trend-strip glass-panel">
+      <div class="loading-state"><div class="spinner"></div> Loading sparklines...</div>
+    </div>
+
+  </main>
+</div>
+
+<script src="../static/js/heatmap.js"></script>
 </body>
 </html>
