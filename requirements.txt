@@ -6,3 +6,4 @@ faiss-cpu
 scikit-learn
 numpy
 python-dotenv
+pypdf

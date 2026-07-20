@@ -45,9 +45,9 @@ def score_permits(active_permits):
     if not active_permits:
         return 0
     
-    types = [permit.get("type", "") for permit in active_permits]
-    has_hot_work = "Hot Work" in types
-    has_confined_space = "Confined Space" in types
+    types = [permit.get("type", "").upper().replace(" ", "_") for permit in active_permits]
+    has_hot_work = "HOT_WORK" in types
+    has_confined_space = "CONFINED_SPACE" in types
     
     if has_hot_work and has_confined_space:
         return 20
