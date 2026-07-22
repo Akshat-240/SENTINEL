@@ -186,9 +186,9 @@ def main():
     def report():
         return render_template('report.html')
 
-    @app.route('/copilot.html')
-    def copilot():
-        return render_template('copilot.html')
+    @app.route('/sentinel_ai.html')
+    def sentinel_ai():
+        return render_template('sentinel_ai.html')
 
     init_db()
     

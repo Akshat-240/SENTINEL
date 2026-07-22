@@ -1,4 +1,4 @@
-// copilot.js
+// sentinel_ai.js
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const zoneSelector = document.getElementById('zone-selector');
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 gsap.from('.message', { y: 20, opacity: 0, duration: 0.5, stagger: 0.1, delay: 0.5 });
             }
         } catch (err) {
-            console.error('Failed to init copilot:', err);
+            console.error('Failed to init Sentinel AI:', err);
         }
     }
 
@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const thinkId = appendThinking();
 
         try {
-            const res = await fetch('/api/rag/copilot', {
+            const res = await fetch('/api/rag/sentinel_ai', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (err) {
             removeMessage(thinkId);
-            appendAIMessage('Error: Network failure communicating with Copilot backend.', []);
+            appendAIMessage('Error: Network failure communicating with Sentinel AI backend.', []);
         }
     }
 

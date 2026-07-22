@@ -45,8 +45,8 @@ def auto_rag(zone_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@rag_bp.route('/copilot', methods=['POST'])
-def copilot_chat():
+@rag_bp.route('/sentinel_ai', methods=['POST'])
+def sentinel_ai_chat():
     try:
         data = request.get_json()
         if not data:
@@ -63,7 +63,7 @@ def copilot_chat():
         
         snapshot = get_zone_snapshot(zone_id)
         formatter = RAGFormatter()
-        output = formatter.format_for_copilot(query, snapshot)
+        output = formatter.format_for_sentinel_ai(query, snapshot)
         return jsonify(output)
     except Exception as e:
         return jsonify({"error": str(e)}), 500

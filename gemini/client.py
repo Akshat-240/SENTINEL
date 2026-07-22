@@ -132,7 +132,7 @@ Current conditions resemble the **{hist_name}** incident. Historically, unmonito
 """
 
 
-def mock_copilot_chat(user_message, context=None):
+def mock_sentinel_ai_chat(user_message, context=None):
     msg = user_message.lower()
     
     if "hot work" in msg and "confined" in msg:
@@ -194,7 +194,7 @@ Safety rules demand that:
 
 Based on this, it is recommended to ensure compliance with the referenced OISD guidelines and the Factory Act. Let me know if you'd like more details on these regulations."""
 
-    return "I am SENTINEL Copilot. Ask me about OISD, Factory Act guidelines, safety thresholds, or historical incident similarity."
+    return "I am Sentinel AI. Ask me about OISD, Factory Act guidelines, safety thresholds, or historical incident similarity."
 
 
 class GeminiClient:
@@ -281,7 +281,8 @@ Format the output as a professional regulatory document in Markdown.
             return mock_generate_incident_report(zone_snapshot, rag_results, risk_factors, compound_score)
         return response_text
 
-    def copilot_chat(self, user_message, context=None):
+
+    def sentinel_ai_chat(self, user_message, context=None):
         """
         Perform RAG query, then respond to user questions using Gemini.
         """
@@ -307,7 +308,7 @@ Format the output as a professional regulatory document in Markdown.
             rag_str += f"[{idx+1}] Source: {res.get('source', 'Unknown')} | {res.get('text', '')}\n\n"
             
         prompt = f"""
-You are SENTINEL Copilot, an advanced safety intelligence assistant for industrial manufacturing and refining plants.
+You are Sentinel AI, an advanced safety intelligence assistant for industrial manufacturing and refining plants.
 {context_str}
 {rag_str}
 Answer the user's question clearly, concisely, and professionally. 
@@ -317,5 +318,5 @@ User Question: {user_message}
 """
         response_text = call_gemini(prompt, max_tokens=1500)
         if response_text is None:
-            return mock_copilot_chat(user_message, context)
+            return mock_sentinel_ai_chat(user_message, context)
         return response_text
