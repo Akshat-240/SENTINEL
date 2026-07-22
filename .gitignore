@@ -17,3 +17,6 @@ venv.bak/
 # Data directories that shouldn't be tracked
 models/
 !models/.gitkeep
+
+# Environment files
+.env

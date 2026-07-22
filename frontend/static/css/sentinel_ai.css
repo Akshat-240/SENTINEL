@@ -1,12 +1,12 @@
 /* sentinel_ai.css */
-.layout-copilot {
+.layout-sentinel-ai {
     display: flex;
     flex-direction: column;
     height: 100vh;
     overflow: hidden;
 }
 
-.copilot-container {
+.sentinel-ai-container {
     display: flex;
     flex: 1;
     gap: 2rem;
