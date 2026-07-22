@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const configRes = await fetch('/api/dashboard/config');
             if (configRes.ok) {
                 const config = await configRes.json();
-                populateZoneSelector(config.zones);
+                populateZoneSelector(config);
             }
             await updateTelemetry();
             
@@ -41,8 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!zones) return;
         zones.forEach(z => {
             const opt = document.createElement('option');
-            opt.value = z.id;
-            opt.textContent = `${z.name} (${z.id})`;
+            opt.value = z.zone_id;
+            opt.textContent = `${z.name} (${z.zone_id})`;
             zoneSelector.appendChild(opt);
         });
     }
@@ -58,13 +58,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 let targetZone = null;
                 if (currentZoneId === 'ALL') {
                     // Highest risk for GLOBAL
-                    targetZone = data.reduce((prev, curr) => (curr.risk_score > prev.risk_score) ? curr : prev, data[0]);
+                    targetZone = data.reduce((prev, curr) => (curr.final_score > prev.final_score) ? curr : prev, data[0]);
                 } else {
-                    targetZone = data.find(z => z.id === currentZoneId);
+                    targetZone = data.find(z => z.zone_id === currentZoneId);
                 }
                 
                 if (targetZone) {
-                    riskValue = targetZone.risk_score;
+                    riskValue = targetZone.final_score;
                     updateRiskUI(riskValue);
                 } else {
                     riskScore.textContent = '--';
