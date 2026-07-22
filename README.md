@@ -26,7 +26,7 @@
 7. **Disaster DNA Similarity (RAG):** AI-powered FAISS vector matching of current conditions against historical disaster signatures.
 8. **Emergency Orchestrator:** Automated suspension of high-risk permits and initiation of evacuation protocols.
 9. **Automated Incident Reporting:** Auto-generated, regulatory-grade markdown reports powered by Gemini.
-10. **Sentinel Copilot:** Interactive, context-aware safety intelligence assistant for incident response and queries.
+10. **Sentinel AI:** Interactive, context-aware safety intelligence assistant for incident response and queries.
 
 ---
 

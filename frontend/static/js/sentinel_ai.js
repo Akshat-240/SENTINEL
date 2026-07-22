@@ -1,4 +1,4 @@
-// copilot.js
+// sentinel_ai.js
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const zoneSelector = document.getElementById('zone-selector');
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const configRes = await fetch('/api/dashboard/config');
             if (configRes.ok) {
                 const config = await configRes.json();
-                populateZoneSelector(config.zones);
+                populateZoneSelector(config);
             }
             await updateTelemetry();
             
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 gsap.from('.message', { y: 20, opacity: 0, duration: 0.5, stagger: 0.1, delay: 0.5 });
             }
         } catch (err) {
-            console.error('Failed to init copilot:', err);
+            console.error('Failed to init Sentinel AI:', err);
         }
     }
 
@@ -41,8 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!zones) return;
         zones.forEach(z => {
             const opt = document.createElement('option');
-            opt.value = z.id;
-            opt.textContent = `${z.name} (${z.id})`;
+            opt.value = z.zone_id;
+            opt.textContent = `${z.name} (${z.zone_id})`;
             zoneSelector.appendChild(opt);
         });
     }
@@ -58,13 +58,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 let targetZone = null;
                 if (currentZoneId === 'ALL') {
                     // Highest risk for GLOBAL
-                    targetZone = data.reduce((prev, curr) => (curr.risk_score > prev.risk_score) ? curr : prev, data[0]);
+                    targetZone = data.reduce((prev, curr) => (curr.final_score > prev.final_score) ? curr : prev, data[0]);
                 } else {
-                    targetZone = data.find(z => z.id === currentZoneId);
+                    targetZone = data.find(z => z.zone_id === currentZoneId);
                 }
                 
                 if (targetZone) {
-                    riskValue = targetZone.risk_score;
+                    riskValue = targetZone.final_score;
                     updateRiskUI(riskValue);
                 } else {
                     riskScore.textContent = '--';
@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const thinkId = appendThinking();
 
         try {
-            const res = await fetch('/api/rag/copilot', {
+            const res = await fetch('/api/rag/sentinel_ai', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (err) {
             removeMessage(thinkId);
-            appendAIMessage('Error: Network failure communicating with Copilot backend.', []);
+            appendAIMessage('Error: Network failure communicating with Sentinel AI backend.', []);
         }
     }
 

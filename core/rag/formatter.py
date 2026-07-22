@@ -148,18 +148,18 @@ class RAGFormatter:
         
         return report
     
-    def format_for_copilot(self, user_message: str, context: Optional[Dict] = None) -> Dict:
+    def format_for_sentinel_ai(self, user_message: str, context: Optional[Dict] = None) -> Dict:
         """
-        Format copilot response with context
+        Format Sentinel AI response with context
         
         Args:
             user_message: User question
             context: Optional zone/incident context
         
         Returns:
-            dict: Formatted copilot response
+            dict: Formatted Sentinel AI response
         """
-        response = self.gemini.copilot_chat(user_message, context)
+        response = self.gemini.sentinel_ai_chat(user_message, context)
         
         return {
             "question": user_message,
@@ -339,13 +339,13 @@ if __name__ == "__main__":
     for v in report['regulatory_violations']:
         print(f"  - {v['code']}: {v['severity']}")
     
-    # Test copilot
+    # Test sentinel_ai
     print("\n" + "=" * 70)
-    print("COPILOT TEST")
+    print("SENTINEL AI TEST")
     print("=" * 70)
-    copilot = formatter.format_for_copilot(
+    sentinel_ai = formatter.format_for_sentinel_ai(
         "What should we do if hot work and confined space overlap?",
         context=test_zone
     )
-    print(f"Q: {copilot['question']}")
-    print(f"A: {copilot['answer'][:200]}...")
+    print(f"Q: {sentinel_ai['question']}")
+    print(f"A: {sentinel_ai['answer'][:200]}...")

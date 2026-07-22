@@ -45,16 +45,18 @@ def auto_rag(zone_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@rag_bp.route('/copilot', methods=['POST'])
-def copilot_chat():
+@rag_bp.route('/sentinel_ai', methods=['POST'])
+def sentinel_ai_chat():
     try:
         data = request.get_json()
         if not data:
             return jsonify({"error": "No JSON payload provided"}), 400
             
         query = data.get("query")
-        zone_id = data.get("zone_id", "ZONE_A")
-        
+        zone_id = data.get("zone_id")
+        if not zone_id:
+            zone_id = "ZONE_A"
+            
         if not query:
             return jsonify({"error": "query is required"}), 400
             
@@ -63,8 +65,14 @@ def copilot_chat():
         
         snapshot = get_zone_snapshot(zone_id)
         formatter = RAGFormatter()
-        output = formatter.format_for_copilot(query, snapshot)
-        return jsonify(output)
+        output = formatter.format_for_sentinel_ai(query, snapshot)
+        
+        # Format response structure to match JS frontend expectation (data.response and data.sources)
+        answer = output.get("answer") if isinstance(output, dict) else str(output)
+        return jsonify({
+            "response": answer,
+            "sources": []
+        })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
